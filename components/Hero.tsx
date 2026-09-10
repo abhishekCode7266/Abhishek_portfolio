@@ -1,7 +1,7 @@
 'use client';
 import { useRef } from 'react';
 import { motion } from 'motion/react';
-import { Github, Linkedin, Mail, Upload, Download, ArrowDown } from 'lucide-react';
+import { Github, Linkedin, Mail, Upload, Download, ArrowDown, Facebook, Instagram, MessageCircle, Send, Twitter, Youtube } from 'lucide-react';
 import { usePortfolio } from '@/app/context/PortfolioContext';
 import Image from 'next/image';
 
@@ -81,13 +81,43 @@ export function Hero() {
             </a>
           </div>
 
-          <div className="flex gap-4 mt-4">
+          <div className="flex flex-wrap gap-4 mt-4">
             <a href={data.socialLinks?.github || "#"} target="_blank" rel="noreferrer" className="p-3 text-slate-500 hover:text-indigo-600 hover:-translate-y-1 transition-all bg-white rounded-full shadow-sm border border-slate-100">
               <Github size={22} />
             </a>
             <a href={data.socialLinks?.linkedin || "#"} target="_blank" rel="noreferrer" className="p-3 text-slate-500 hover:text-indigo-600 hover:-translate-y-1 transition-all bg-white rounded-full shadow-sm border border-slate-100">
               <Linkedin size={22} />
             </a>
+            {data.socialLinks?.whatsapp && (
+              <a href={`https://wa.me/${data.socialLinks.whatsapp.replace(/[^0-9]/g, '')}`} target="_blank" rel="noreferrer" className="p-3 text-slate-500 hover:text-green-500 hover:-translate-y-1 transition-all bg-white rounded-full shadow-sm border border-slate-100" title="WhatsApp">
+                <MessageCircle size={22} />
+              </a>
+            )}
+            {data.socialLinks?.telegram && (
+              <a href={data.socialLinks.telegram} target="_blank" rel="noreferrer" className="p-3 text-slate-500 hover:text-blue-500 hover:-translate-y-1 transition-all bg-white rounded-full shadow-sm border border-slate-100" title="Telegram">
+                <Send size={22} />
+              </a>
+            )}
+            {data.socialLinks?.instagram && (
+              <a href={data.socialLinks.instagram} target="_blank" rel="noreferrer" className="p-3 text-slate-500 hover:text-pink-600 hover:-translate-y-1 transition-all bg-white rounded-full shadow-sm border border-slate-100" title="Instagram">
+                <Instagram size={22} />
+              </a>
+            )}
+            {data.socialLinks?.facebook && (
+              <a href={data.socialLinks.facebook} target="_blank" rel="noreferrer" className="p-3 text-slate-500 hover:text-blue-600 hover:-translate-y-1 transition-all bg-white rounded-full shadow-sm border border-slate-100" title="Facebook">
+                <Facebook size={22} />
+              </a>
+            )}
+            {data.socialLinks?.twitter && (
+              <a href={data.socialLinks.twitter} target="_blank" rel="noreferrer" className="p-3 text-slate-500 hover:text-sky-500 hover:-translate-y-1 transition-all bg-white rounded-full shadow-sm border border-slate-100" title="Twitter / X">
+                <Twitter size={22} />
+              </a>
+            )}
+            {data.socialLinks?.youtube && (
+              <a href={data.socialLinks.youtube} target="_blank" rel="noreferrer" className="p-3 text-slate-500 hover:text-red-600 hover:-translate-y-1 transition-all bg-white rounded-full shadow-sm border border-slate-100" title="YouTube">
+                <Youtube size={22} />
+              </a>
+            )}
             <a href={data.socialLinks?.email ? `mailto:${data.socialLinks.email}` : "#"} className="p-3 text-slate-500 hover:text-indigo-600 hover:-translate-y-1 transition-all bg-white rounded-full shadow-sm border border-slate-100">
               <Mail size={22} />
             </a>

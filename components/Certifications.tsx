@@ -1,7 +1,7 @@
 'use client';
 import { motion } from 'motion/react';
 import { SectionHeading } from './SectionHeading';
-import { Plus, Award, ExternalLink } from 'lucide-react';
+import { Plus, Award, ExternalLink, FileText } from 'lucide-react';
 import { usePortfolio } from '@/app/context/PortfolioContext';
 
 export function Certifications() {
@@ -32,11 +32,18 @@ export function Certifications() {
               <h4 className="text-xl font-bold text-slate-800 mb-2 group-hover:text-indigo-600 transition-colors">{cert.name}</h4>
               <p className="text-slate-600 mb-6">{cert.issuer}</p>
               
-              <div className="flex items-center justify-between mt-auto pt-6 border-t border-slate-50">
-                <span className="text-sm font-medium text-slate-400">{cert.date}</span>
-                {cert.link && (
-                  <a href={cert.link} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors">
-                    Verify <ExternalLink size={14} />
+              <div className="flex flex-col gap-3 mt-auto pt-6 border-t border-slate-50">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-slate-400">{cert.date}</span>
+                  {cert.link && (
+                    <a href={cert.link} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors">
+                      Verify <ExternalLink size={14} />
+                    </a>
+                  )}
+                </div>
+                {cert.fileUrl && (
+                  <a href={cert.fileUrl} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 w-full py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 text-sm font-medium rounded-xl transition-colors border border-slate-200">
+                    <FileText size={16} /> View Certificate
                   </a>
                 )}
               </div>

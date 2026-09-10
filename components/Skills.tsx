@@ -1,37 +1,22 @@
 'use client';
 import { motion } from 'motion/react';
 import { SectionHeading } from './SectionHeading';
-import { Code, Database, BrainCircuit, TerminalSquare, Wrench } from 'lucide-react';
+import { Code, Database, BrainCircuit, TerminalSquare, Wrench, Layers } from 'lucide-react';
+import { usePortfolio } from '@/app/context/PortfolioContext';
 
-const skills = [
-  {
-    category: "Frontend Development",
-    icon: <Code size={24} className="text-indigo-500" />,
-    tags: ["HTML5", "CSS3", "JavaScript", "Responsive Web Design", "DOM Manipulation", "Git & GitHub"]
-  },
-  {
-    category: "Data Analytics",
-    icon: <Database size={24} className="text-indigo-500" />,
-    tags: ["Python", "Pandas", "NumPy", "Matplotlib", "Data Cleaning", "Data Analysis", "Data Visualization", "EDA", "Jupyter Notebook"]
-  },
-  {
-    category: "AI / ML",
-    icon: <BrainCircuit size={24} className="text-indigo-500" />,
-    tags: ["Python", "NumPy", "Pandas", "Matplotlib", "ML Fundamentals", "Data Preprocessing", "EDA", "Basic Model Evaluation"]
-  },
-  {
-    category: "Software Development",
-    icon: <TerminalSquare size={24} className="text-indigo-500" />,
-    tags: ["Python", "Java", "JavaScript", "OOP", "Problem Solving"]
-  },
-  {
-    category: "Tools & Environment",
-    icon: <Wrench size={24} className="text-indigo-500" />,
-    tags: ["VS Code", "Git", "GitHub", "Jupyter Notebook"]
-  }
-];
+const getCategoryIcon = (category: string) => {
+  const cat = category.toLowerCase();
+  if (cat.includes('frontend') || cat.includes('web') || cat.includes('ui')) return <Code size={24} className="text-indigo-500" />;
+  if (cat.includes('data') || cat.includes('backend') || cat.includes('sql')) return <Database size={24} className="text-indigo-500" />;
+  if (cat.includes('ai') || cat.includes('ml') || cat.includes('learning')) return <BrainCircuit size={24} className="text-indigo-500" />;
+  if (cat.includes('software') || cat.includes('app') || cat.includes('mobile')) return <TerminalSquare size={24} className="text-indigo-500" />;
+  if (cat.includes('tools') || cat.includes('git') || cat.includes('env')) return <Wrench size={24} className="text-indigo-500" />;
+  return <Layers size={24} className="text-indigo-500" />;
+};
 
 export function Skills() {
+  const { data } = usePortfolio();
+
   const containerVariants = {
     hidden: { opacity: 0 },
     show: {
@@ -47,6 +32,8 @@ export function Skills() {
     show: { opacity: 1, y: 0, transition: { duration: 0.5 } }
   };
 
+  if (!data.skills || data.skills.length === 0) return null;
+
   return (
     <section id="skills" className="py-24 bg-[#f4f7fa]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -59,15 +46,15 @@ export function Skills() {
           viewport={{ once: true, margin: "-50px" }}
           className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
         >
-          {skills.map((skillGroup, index) => (
+          {data.skills.map((skillGroup, index) => (
             <motion.div 
-              key={index} 
+              key={skillGroup.id || index} 
               variants={itemVariants}
               className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 hover:shadow-md transition-shadow"
             >
               <div className="flex items-center gap-4 mb-6">
                 <div className="p-3 bg-indigo-50 rounded-2xl">
-                  {skillGroup.icon}
+                  {getCategoryIcon(skillGroup.category)}
                 </div>
                 <h3 className="text-xl font-bold text-slate-800">{skillGroup.category}</h3>
               </div>

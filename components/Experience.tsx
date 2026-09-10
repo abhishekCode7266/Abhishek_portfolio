@@ -49,6 +49,19 @@ export function Experience() {
                     <p className={`leading-relaxed p-4 rounded-xl border text-sm ${exp.isSeeking ? 'bg-slate-50 text-slate-400 border-slate-100' : 'bg-white text-slate-600 border-slate-100'}`}>
                       {exp.description}
                     </p>
+
+                    {exp.certificateUrl && (
+                      <div className="mt-4">
+                        <a 
+                          href={exp.certificateUrl} 
+                          target="_blank" 
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 font-medium text-sm rounded-lg transition-colors shadow-sm"
+                        >
+                          <Briefcase size={16} /> View Certificate
+                        </a>
+                      </div>
+                    )}
                     
                     {exp.isSeeking && (
                       <div className="mt-8 flex items-center justify-center gap-3 text-indigo-600 bg-indigo-50/50 p-4 rounded-xl border border-indigo-100">

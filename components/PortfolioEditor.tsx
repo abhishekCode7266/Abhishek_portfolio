@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { usePortfolio } from '@/app/context/PortfolioContext';
 import { Settings, X, Plus, Trash2, Upload, FileText } from 'lucide-react';
 
-const TABS = ['General', 'About', 'Education', 'Experience', 'Projects', 'Certifications'];
+const TABS = ['General', 'About', 'Skills', 'Education', 'Experience & Internships', 'Projects', 'Certifications'];
 
 export function PortfolioEditor() {
   const { data, updateData, isEditorOpen, setIsEditorOpen } = usePortfolio();
@@ -67,14 +67,18 @@ export function PortfolioEditor() {
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 p-6 md:p-10 overflow-y-auto bg-white relative">
-          <button onClick={() => setIsEditorOpen(false)} className="hidden md:flex absolute top-6 right-6 p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-full transition-colors">
-            <X size={24} />
-          </button>
-          
-          <h3 className="text-2xl font-bold text-slate-800 mb-8 pb-4 border-b border-slate-100">{activeTab}</h3>
+        <div className="flex-1 p-6 md:p-10 overflow-y-auto bg-white relative flex flex-col">
+          <div className="flex items-center justify-between mb-8 pb-4 border-b border-slate-100 shrink-0">
+            <h3 className="text-2xl font-bold text-slate-800">{activeTab}</h3>
+            <button 
+              onClick={() => setIsEditorOpen(false)} 
+              className="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 transition-colors shadow-sm"
+            >
+              Save & Close
+            </button>
+          </div>
 
-          <div className="space-y-8 max-w-3xl">
+          <div className="space-y-8 max-w-3xl flex-1 pb-10">
             {activeTab === 'General' && (
               <div className="space-y-6">
                 <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
@@ -142,6 +146,68 @@ export function PortfolioEditor() {
                         placeholder="your.email@example.com" 
                       />
                     </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">WhatsApp Number</label>
+                        <input 
+                          type="text" 
+                          value={data.socialLinks?.whatsapp || ''} 
+                          onChange={e => updateData({ socialLinks: { ...data.socialLinks, whatsapp: e.target.value } })} 
+                          className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all" 
+                          placeholder="e.g. +91 9876543210" 
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Telegram Profile URL</label>
+                        <input 
+                          type="text" 
+                          value={data.socialLinks?.telegram || ''} 
+                          onChange={e => updateData({ socialLinks: { ...data.socialLinks, telegram: e.target.value } })} 
+                          className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all" 
+                          placeholder="https://t.me/yourusername" 
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Instagram URL</label>
+                        <input 
+                          type="text" 
+                          value={data.socialLinks?.instagram || ''} 
+                          onChange={e => updateData({ socialLinks: { ...data.socialLinks, instagram: e.target.value } })} 
+                          className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all" 
+                          placeholder="https://instagram.com/yourusername" 
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Facebook URL</label>
+                        <input 
+                          type="text" 
+                          value={data.socialLinks?.facebook || ''} 
+                          onChange={e => updateData({ socialLinks: { ...data.socialLinks, facebook: e.target.value } })} 
+                          className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all" 
+                          placeholder="https://facebook.com/yourusername" 
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Twitter / X URL</label>
+                        <input 
+                          type="text" 
+                          value={data.socialLinks?.twitter || ''} 
+                          onChange={e => updateData({ socialLinks: { ...data.socialLinks, twitter: e.target.value } })} 
+                          className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all" 
+                          placeholder="https://twitter.com/yourusername" 
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">YouTube URL</label>
+                        <input 
+                          type="text" 
+                          value={data.socialLinks?.youtube || ''} 
+                          onChange={e => updateData({ socialLinks: { ...data.socialLinks, youtube: e.target.value } })} 
+                          className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all" 
+                          placeholder="https://youtube.com/@yourchannel" 
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -158,6 +224,34 @@ export function PortfolioEditor() {
                   placeholder="Write your bio here..."
                 />
                 <p className="text-xs text-slate-500 mt-2">Line breaks will be preserved as paragraphs on the website.</p>
+                <div className="mt-4 flex justify-end">
+                  <button onClick={() => setIsEditorOpen(false)} className="px-6 py-2.5 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 transition-colors shadow-sm">
+                    Update Details
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'Skills' && (
+              <div className="space-y-6">
+                {data.skills?.map((skillGroup, idx) => (
+                  <div key={skillGroup.id} className="p-6 border border-slate-200 rounded-2xl bg-white shadow-sm relative group">
+                    <button onClick={() => handleArrayRemove('skills', idx)} className="absolute top-4 right-4 text-red-400 p-2 hover:bg-red-50 hover:text-red-600 rounded-xl transition-colors"><Trash2 size={18}/></button>
+                    <div className="grid gap-4 pr-10">
+                      <div>
+                        <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Category Name</label>
+                        <input type="text" value={skillGroup.category} onChange={e => handleArrayUpdate('skills', idx, 'category', e.target.value)} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-medium text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all" placeholder="e.g. Frontend Development" />
+                      </div>
+                      <div>
+                        <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Skills (comma separated)</label>
+                        <input type="text" value={skillGroup.tags.join(', ')} onChange={e => handleArrayUpdate('skills', idx, 'tags', e.target.value.split(',').map(t => t.trim()))} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all" placeholder="HTML, CSS, JavaScript, React" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                <button onClick={() => handleArrayAdd('skills', { id: Date.now().toString(), category: 'New Category', tags: [] })} className="flex items-center justify-center gap-2 w-full border-2 border-dashed border-indigo-200 text-indigo-600 font-semibold hover:bg-indigo-50 py-4 rounded-2xl transition-colors">
+                  <Plus size={18} /> Add Skill Category
+                </button>
               </div>
             )}
 
@@ -168,12 +262,12 @@ export function PortfolioEditor() {
                     <button onClick={() => handleArrayRemove('education', idx)} className="absolute top-4 right-4 text-red-400 p-2 hover:bg-red-50 hover:text-red-600 rounded-xl transition-colors"><Trash2 size={18}/></button>
                     <div className="grid gap-4 pr-10">
                       <div>
-                        <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Degree / Certification</label>
-                        <input type="text" value={edu.degree} onChange={e => handleArrayUpdate('education', idx, 'degree', e.target.value)} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all" placeholder="e.g. B.Tech Computer Science" />
+                        <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Degree / Course / Standard</label>
+                        <input type="text" value={edu.degree} onChange={e => handleArrayUpdate('education', idx, 'degree', e.target.value)} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all" placeholder="e.g. B.Tech, 12th Standard, Web Dev Course" />
                       </div>
                       <div>
-                        <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Institution</label>
-                        <input type="text" value={edu.institution} onChange={e => handleArrayUpdate('education', idx, 'institution', e.target.value)} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all" placeholder="University or College Name" />
+                        <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Institution / School</label>
+                        <input type="text" value={edu.institution} onChange={e => handleArrayUpdate('education', idx, 'institution', e.target.value)} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all" placeholder="School, University or College Name" />
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
@@ -189,12 +283,12 @@ export function PortfolioEditor() {
                   </div>
                 ))}
                 <button onClick={() => handleArrayAdd('education', { id: Date.now().toString(), degree: '', institution: '', period: '', location: '' })} className="flex items-center justify-center gap-2 w-full border-2 border-dashed border-indigo-200 text-indigo-600 font-semibold hover:bg-indigo-50 py-4 rounded-2xl transition-colors">
-                  <Plus size={18} /> Add Education Record
+                  <Plus size={18} /> Add Education Record (Degree, 12th, 10th)
                 </button>
               </div>
             )}
 
-            {activeTab === 'Experience' && (
+            {activeTab === 'Experience & Internships' && (
               <div className="space-y-6">
                 {data.experience.map((exp, idx) => (
                   <div key={exp.id} className="p-6 border border-slate-200 rounded-2xl bg-white shadow-sm relative group">
@@ -218,17 +312,37 @@ export function PortfolioEditor() {
                          <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Description</label>
                          <textarea value={exp.description} onChange={e => handleArrayUpdate('experience', idx, 'description', e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all resize-y" placeholder="Summarize your responsibilities..." rows={3} />
                       </div>
-                      <div className="pt-2">
+                      <div className="pt-2 flex flex-col sm:flex-row gap-4 items-start sm:items-center">
                         <label className="flex items-center gap-3 p-3 border border-indigo-100 bg-indigo-50/50 rounded-xl cursor-pointer hover:bg-indigo-50 transition-colors w-max">
                           <input type="checkbox" checked={exp.isSeeking} onChange={e => handleArrayUpdate('experience', idx, 'isSeeking', e.target.checked)} className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500" />
                           <span className="text-sm font-medium text-indigo-900">Mark as &quot;Seeking Opportunities&quot; Placeholder</span>
                         </label>
+
+                        <div className="flex items-center gap-4 border border-indigo-100 p-3 rounded-xl bg-indigo-50/20">
+                          <label className="cursor-pointer px-4 py-2 bg-white text-indigo-600 font-medium rounded-lg border border-indigo-200 hover:bg-indigo-50 transition-colors flex items-center gap-2 text-sm shadow-sm">
+                            <Upload size={16} /> Upload Certificate
+                            <input 
+                              type="file" 
+                              accept="image/*,application/pdf"
+                              className="hidden" 
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                  const reader = new FileReader();
+                                  reader.onloadend = () => handleArrayUpdate('experience', idx, 'certificateUrl', reader.result);
+                                  reader.readAsDataURL(file);
+                                }
+                              }}
+                            />
+                          </label>
+                          {exp.certificateUrl && <span className="text-xs text-green-600 font-medium bg-green-50 px-3 py-1.5 rounded-lg border border-green-200 flex items-center gap-1"><FileText size={14}/> Attached</span>}
+                        </div>
                       </div>
                     </div>
                   </div>
                 ))}
                 <button onClick={() => handleArrayAdd('experience', { id: Date.now().toString(), title: '', company: '', duration: '', description: '', isSeeking: false })} className="flex items-center justify-center gap-2 w-full border-2 border-dashed border-indigo-200 text-indigo-600 font-semibold hover:bg-indigo-50 py-4 rounded-2xl transition-colors">
-                  <Plus size={18} /> Add Experience Record
+                  <Plus size={18} /> Add Experience / Internship
                 </button>
               </div>
             )}
@@ -239,24 +353,58 @@ export function PortfolioEditor() {
                   <div key={proj.id} className="p-6 border border-slate-200 rounded-2xl bg-white shadow-sm relative group">
                     <button onClick={() => handleArrayRemove('projects', idx)} className="absolute top-4 right-4 text-red-400 p-2 hover:bg-red-50 hover:text-red-600 rounded-xl transition-colors"><Trash2 size={18}/></button>
                     <div className="grid gap-5 pr-10">
+                      
+                      {/* Project Image Upload */}
+                      <div>
+                        <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Project Image</label>
+                        <div className="flex items-center gap-4">
+                          <label className="cursor-pointer px-4 py-2 bg-indigo-50 text-indigo-600 font-medium rounded-xl hover:bg-indigo-100 transition-colors flex items-center gap-2 text-sm border border-indigo-200">
+                            <Upload size={16} /> Choose Image
+                            <input 
+                              type="file" 
+                              accept="image/*"
+                              className="hidden" 
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                  const reader = new FileReader();
+                                  reader.onloadend = () => handleArrayUpdate('projects', idx, 'imageUrl', reader.result);
+                                  reader.readAsDataURL(file);
+                                }
+                              }}
+                            />
+                          </label>
+                          {proj.imageUrl && <span className="text-xs text-green-600 font-medium bg-green-50 px-3 py-1.5 rounded-lg border border-green-200">Image uploaded successfully</span>}
+                        </div>
+                      </div>
+
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div>
                           <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Project Title</label>
                           <input type="text" value={proj.title} onChange={e => handleArrayUpdate('projects', idx, 'title', e.target.value)} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-medium text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all" />
                         </div>
                         <div>
+                          <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Tags (comma separated)</label>
+                          <input type="text" value={proj.tags.join(', ')} onChange={e => handleArrayUpdate('projects', idx, 'tags', e.target.value.split(',').map(t => t.trim()))} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all" placeholder="React, Node, Tailwind" />
+                        </div>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
                           <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">GitHub Link</label>
                           <input type="text" value={proj.github} onChange={e => handleArrayUpdate('projects', idx, 'github', e.target.value)} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-mono text-sm text-indigo-600 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all" placeholder="https://github.com/..." />
                         </div>
+                        <div>
+                          <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Live Demo Link (Optional)</label>
+                          <input type="text" value={proj.demoUrl || ''} onChange={e => handleArrayUpdate('projects', idx, 'demoUrl', e.target.value)} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-mono text-sm text-indigo-600 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all" placeholder="https://yourproject.com" />
+                        </div>
                       </div>
+
                       <div>
                         <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Description</label>
-                        <textarea value={proj.description} onChange={e => handleArrayUpdate('projects', idx, 'description', e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all resize-y" rows={2} />
+                        <textarea value={proj.description} onChange={e => handleArrayUpdate('projects', idx, 'description', e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all resize-y" rows={3} />
                       </div>
-                      <div>
-                        <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Tags (comma separated)</label>
-                        <input type="text" value={proj.tags.join(', ')} onChange={e => handleArrayUpdate('projects', idx, 'tags', e.target.value.split(',').map(t => t.trim()))} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all" placeholder="React, Node, Tailwind" />
-                      </div>
+                      
                       <div className="pt-2">
                         <label className="flex items-center gap-3 p-3 border border-indigo-100 bg-indigo-50/50 rounded-xl cursor-pointer hover:bg-indigo-50 transition-colors w-max">
                           <input type="checkbox" checked={proj.featured} onChange={e => handleArrayUpdate('projects', idx, 'featured', e.target.checked)} className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500" />
@@ -266,7 +414,7 @@ export function PortfolioEditor() {
                     </div>
                   </div>
                 ))}
-                <button onClick={() => handleArrayAdd('projects', { id: Date.now().toString(), title: 'New Project', description: '', github: '', tags: [], featured: false })} className="flex items-center justify-center gap-2 w-full border-2 border-dashed border-indigo-200 text-indigo-600 font-semibold hover:bg-indigo-50 py-4 rounded-2xl transition-colors">
+                <button onClick={() => handleArrayAdd('projects', { id: Date.now().toString(), title: 'New Project', description: '', github: '', demoUrl: '', imageUrl: '', tags: [], featured: false })} className="flex items-center justify-center gap-2 w-full border-2 border-dashed border-indigo-200 text-indigo-600 font-semibold hover:bg-indigo-50 py-4 rounded-2xl transition-colors">
                   <Plus size={18} /> Add Project
                 </button>
               </div>
@@ -278,9 +426,33 @@ export function PortfolioEditor() {
                   <div key={cert.id} className="p-6 border border-slate-200 rounded-2xl bg-white shadow-sm relative group">
                     <button onClick={() => handleArrayRemove('certifications', idx)} className="absolute top-4 right-4 text-red-400 p-2 hover:bg-red-50 hover:text-red-600 rounded-xl transition-colors"><Trash2 size={18}/></button>
                     <div className="grid gap-4 pr-10">
-                      <div>
-                         <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Certification Name</label>
-                         <input type="text" value={cert.name} onChange={e => handleArrayUpdate('certifications', idx, 'name', e.target.value)} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-medium text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all" />
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                           <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Certification Name</label>
+                           <input type="text" value={cert.name} onChange={e => handleArrayUpdate('certifications', idx, 'name', e.target.value)} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-medium text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all" />
+                        </div>
+                        <div>
+                           <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Certificate Image/PDF</label>
+                           <div className="flex items-center gap-3">
+                             <label className="cursor-pointer px-4 py-2.5 bg-white border border-indigo-200 text-indigo-600 font-medium rounded-xl hover:bg-indigo-50 transition-colors flex items-center gap-2 text-sm">
+                               <Upload size={16} /> Upload
+                               <input 
+                                 type="file" 
+                                 accept="image/*,.pdf"
+                                 className="hidden" 
+                                 onChange={(e) => {
+                                   const file = e.target.files?.[0];
+                                   if (file) {
+                                     const reader = new FileReader();
+                                     reader.onloadend = () => handleArrayUpdate('certifications', idx, 'fileUrl', reader.result);
+                                     reader.readAsDataURL(file);
+                                   }
+                                 }}
+                               />
+                             </label>
+                             {cert.fileUrl && <span className="text-xs text-green-600 font-medium bg-green-50 px-2 py-1 rounded border border-green-200">Attached</span>}
+                           </div>
+                        </div>
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
@@ -299,7 +471,7 @@ export function PortfolioEditor() {
                     </div>
                   </div>
                 ))}
-                <button onClick={() => handleArrayAdd('certifications', { id: Date.now().toString(), name: '', issuer: '', date: '', link: '' })} className="flex items-center justify-center gap-2 w-full border-2 border-dashed border-indigo-200 text-indigo-600 font-semibold hover:bg-indigo-50 py-4 rounded-2xl transition-colors">
+                <button onClick={() => handleArrayAdd('certifications', { id: Date.now().toString(), name: '', issuer: '', date: '', link: '', fileUrl: '' })} className="flex items-center justify-center gap-2 w-full border-2 border-dashed border-indigo-200 text-indigo-600 font-semibold hover:bg-indigo-50 py-4 rounded-2xl transition-colors">
                   <Plus size={18} /> Add Certification
                 </button>
               </div>

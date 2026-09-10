@@ -1,8 +1,9 @@
 'use client';
 import { motion } from 'motion/react';
 import { SectionHeading } from './SectionHeading';
-import { Github, Folder, ExternalLink } from 'lucide-react';
+import { Github, Folder, ExternalLink, Globe } from 'lucide-react';
 import { usePortfolio } from '@/app/context/PortfolioContext';
+import Image from 'next/image';
 
 export function Projects() {
   const { data } = usePortfolio();
@@ -43,28 +44,44 @@ export function Projects() {
                   ))}
                 </div>
                 
-                <div className="flex items-center gap-4">
+                <div className="flex flex-wrap items-center gap-4">
                   <a href={featuredProject.github} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-6 py-3 bg-white text-slate-900 font-semibold rounded-xl hover:bg-indigo-50 transition-colors">
                     <Github size={20} />
                     View Source
                   </a>
+                  {featuredProject.demoUrl && (
+                    <a href={featuredProject.demoUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-6 py-3 bg-slate-800 text-white font-semibold rounded-xl hover:bg-slate-700 transition-colors border border-slate-700">
+                      <Globe size={20} />
+                      Live Demo
+                    </a>
+                  )}
                 </div>
               </div>
               <div className="hidden lg:block relative h-full min-h-[300px] w-full bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden shadow-2xl group-hover:border-indigo-500/50 transition-colors">
-                 {/* Decorative Terminal Window */}
-                 <div className="absolute inset-0 flex flex-col">
-                   <div className="h-10 bg-slate-900 border-b border-slate-700 flex items-center px-4 gap-2">
-                      <div className="w-3 h-3 rounded-full bg-red-500/80" />
-                      <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
-                      <div className="w-3 h-3 rounded-full bg-green-500/80" />
+                 {featuredProject.imageUrl ? (
+                   <Image 
+                     src={featuredProject.imageUrl} 
+                     alt={featuredProject.title} 
+                     fill 
+                     className="object-cover transition-transform duration-700 group-hover:scale-105"
+                     referrerPolicy="no-referrer"
+                   />
+                 ) : (
+                   /* Decorative Terminal Window */
+                   <div className="absolute inset-0 flex flex-col">
+                     <div className="h-10 bg-slate-900 border-b border-slate-700 flex items-center px-4 gap-2">
+                        <div className="w-3 h-3 rounded-full bg-red-500/80" />
+                        <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
+                        <div className="w-3 h-3 rounded-full bg-green-500/80" />
+                     </div>
+                     <div className="flex-1 p-6 font-mono text-sm text-indigo-300/80 leading-relaxed overflow-hidden flex flex-col gap-2">
+                        <p>{'>'} Initializing Component...</p>
+                        <p>{'>'} Loading Data: 100%</p>
+                        <p>{'>'} Syncing Modules...</p>
+                        <p className="text-green-400 mt-4">System Online and Ready.</p>
+                     </div>
                    </div>
-                   <div className="flex-1 p-6 font-mono text-sm text-indigo-300/80 leading-relaxed overflow-hidden flex flex-col gap-2">
-                      <p>{'>'} Initializing Component...</p>
-                      <p>{'>'} Loading Data: 100%</p>
-                      <p>{'>'} Syncing Modules...</p>
-                      <p className="text-green-400 mt-4">System Online and Ready.</p>
-                   </div>
-                 </div>
+                 )}
               </div>
             </div>
           </motion.div>
@@ -84,22 +101,30 @@ export function Projects() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: idx * 0.1 }}
-              className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm hover:shadow-xl hover:border-indigo-100 transition-all group flex flex-col h-full"
+              className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm hover:shadow-xl hover:border-indigo-100 transition-all group flex flex-col h-full relative overflow-hidden"
             >
-              <div className="flex justify-between items-start mb-6">
+              {project.imageUrl && (
+                <div className="absolute inset-0 opacity-5 group-hover:opacity-10 transition-opacity pointer-events-none">
+                  <Image src={project.imageUrl} alt="" fill className="object-cover blur-sm" referrerPolicy="no-referrer" />
+                </div>
+              )}
+              
+              <div className="relative z-10 flex justify-between items-start mb-6">
                 <div className="p-3 bg-indigo-50 rounded-xl text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
                   <Folder size={28} />
                 </div>
                 <div className="flex gap-3 text-slate-400">
                   <a href={project.github} target="_blank" rel="noreferrer" className="hover:text-indigo-600 transition-colors"><Github size={20} /></a>
-                  <a href={project.github} target="_blank" rel="noreferrer" className="hover:text-indigo-600 transition-colors"><ExternalLink size={20} /></a>
+                  {project.demoUrl && (
+                    <a href={project.demoUrl} target="_blank" rel="noreferrer" className="hover:text-indigo-600 transition-colors"><ExternalLink size={20} /></a>
+                  )}
                 </div>
               </div>
               
-              <h4 className="text-xl font-bold text-slate-800 mb-3 group-hover:text-indigo-600 transition-colors">{project.title}</h4>
-              <p className="text-slate-600 leading-relaxed mb-8 flex-1">{project.description}</p>
+              <h4 className="relative z-10 text-xl font-bold text-slate-800 mb-3 group-hover:text-indigo-600 transition-colors">{project.title}</h4>
+              <p className="relative z-10 text-slate-600 leading-relaxed mb-8 flex-1">{project.description}</p>
               
-              <div className="flex flex-wrap gap-2 mt-auto">
+              <div className="relative z-10 flex flex-wrap gap-2 mt-auto">
                 {project.tags.map((tag, tagIdx) => (
                   <span key={tagIdx} className="text-xs font-mono text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md">
                     {tag}

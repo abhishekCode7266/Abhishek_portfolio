@@ -1,5 +1,5 @@
 'use client';
-import { Github, Linkedin, Mail } from 'lucide-react';
+import { Github, Linkedin, Mail, Facebook, Instagram, MessageCircle, Send, Twitter, Youtube } from 'lucide-react';
 import { usePortfolio } from '@/app/context/PortfolioContext';
 
 export function Footer() {
@@ -13,13 +13,43 @@ export function Footer() {
             <span className="text-2xl font-bold text-white tracking-tight mb-2 block">ASY.</span>
             <p className="text-sm max-w-sm">Designing and building modern digital experiences. Available for new opportunities.</p>
           </div>
-          <div className="flex gap-5">
+          <div className="flex flex-wrap gap-5">
             <a href={data.socialLinks?.github || "#"} target="_blank" rel="noreferrer" className="hover:text-white transition-colors">
               <Github size={20} />
             </a>
             <a href={data.socialLinks?.linkedin || "#"} target="_blank" rel="noreferrer" className="hover:text-white transition-colors">
               <Linkedin size={20} />
             </a>
+            {data.socialLinks?.whatsapp && (
+              <a href={`https://wa.me/${data.socialLinks.whatsapp.replace(/[^0-9]/g, '')}`} target="_blank" rel="noreferrer" className="hover:text-white transition-colors" title="WhatsApp">
+                <MessageCircle size={20} />
+              </a>
+            )}
+            {data.socialLinks?.telegram && (
+              <a href={data.socialLinks.telegram} target="_blank" rel="noreferrer" className="hover:text-white transition-colors" title="Telegram">
+                <Send size={20} />
+              </a>
+            )}
+            {data.socialLinks?.instagram && (
+              <a href={data.socialLinks.instagram} target="_blank" rel="noreferrer" className="hover:text-white transition-colors" title="Instagram">
+                <Instagram size={20} />
+              </a>
+            )}
+            {data.socialLinks?.facebook && (
+              <a href={data.socialLinks.facebook} target="_blank" rel="noreferrer" className="hover:text-white transition-colors" title="Facebook">
+                <Facebook size={20} />
+              </a>
+            )}
+            {data.socialLinks?.twitter && (
+              <a href={data.socialLinks.twitter} target="_blank" rel="noreferrer" className="hover:text-white transition-colors" title="Twitter / X">
+                <Twitter size={20} />
+              </a>
+            )}
+            {data.socialLinks?.youtube && (
+              <a href={data.socialLinks.youtube} target="_blank" rel="noreferrer" className="hover:text-white transition-colors" title="YouTube">
+                <Youtube size={20} />
+              </a>
+            )}
             <a href={data.socialLinks?.email ? `mailto:${data.socialLinks.email}` : "#"} className="hover:text-white transition-colors">
               <Mail size={20} />
             </a>

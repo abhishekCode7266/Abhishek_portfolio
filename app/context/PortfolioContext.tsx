@@ -1,12 +1,20 @@
 'use client';
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
+export type SkillGroup = {
+  id: string;
+  category: string;
+  tags: string[];
+};
+
 export type Project = {
   id: string;
   title: string;
   description: string;
   tags: string[];
   github: string;
+  demoUrl?: string;
+  imageUrl?: string;
   featured: boolean;
 };
 
@@ -17,6 +25,7 @@ export type Experience = {
   duration: string;
   description: string;
   isSeeking: boolean;
+  certificateUrl?: string;
 };
 
 export type Education = {
@@ -33,6 +42,7 @@ export type Certification = {
   issuer: string;
   date: string;
   link: string;
+  fileUrl?: string;
 };
 
 export type PortfolioData = {
@@ -44,10 +54,18 @@ export type PortfolioData = {
   experience: Experience[];
   projects: Project[];
   certifications: Certification[];
+  skills: SkillGroup[];
   socialLinks: {
     github: string;
     linkedin: string;
     email: string;
+    whatsapp?: string;
+    facebook?: string;
+    instagram?: string;
+    telegram?: string;
+    twitter?: string;
+    youtube?: string;
+    discord?: string;
   };
 };
 
@@ -82,6 +100,8 @@ const defaultData: PortfolioData = {
       description: "A comprehensive Java-based OOP desktop application designed for managing patient records, doctor schedules, and hospital administrative tasks efficiently.",
       tags: ["Java", "OOP", "Data Structures", "Desktop App"],
       github: "#",
+      demoUrl: "",
+      imageUrl: "",
       featured: true
     },
     {
@@ -134,10 +154,44 @@ const defaultData: PortfolioData = {
     }
   ],
   certifications: [],
+  skills: [
+    {
+      id: "s1",
+      category: "Frontend Development",
+      tags: ["HTML5", "CSS3", "JavaScript", "Responsive Web Design", "DOM Manipulation", "Git & GitHub"]
+    },
+    {
+      id: "s2",
+      category: "Data Analytics",
+      tags: ["Python", "Pandas", "NumPy", "Matplotlib", "Data Cleaning", "Data Analysis", "Data Visualization", "EDA", "Jupyter Notebook"]
+    },
+    {
+      id: "s3",
+      category: "AI / ML",
+      tags: ["Python", "NumPy", "Pandas", "Matplotlib", "ML Fundamentals", "Data Preprocessing", "EDA", "Basic Model Evaluation"]
+    },
+    {
+      id: "s4",
+      category: "Software Development",
+      tags: ["Python", "Java", "JavaScript", "OOP", "Problem Solving"]
+    },
+    {
+      id: "s5",
+      category: "Tools & Environment",
+      tags: ["VS Code", "Git", "GitHub", "Jupyter Notebook"]
+    }
+  ],
   socialLinks: {
     github: "https://github.com",
     linkedin: "https://linkedin.com",
-    email: "abhisheksoraon9@gmail.com"
+    email: "abhisheksoraon9@gmail.com",
+    whatsapp: "",
+    facebook: "",
+    instagram: "",
+    telegram: "",
+    twitter: "",
+    youtube: "",
+    discord: ""
   }
 };
 
@@ -158,8 +212,13 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
     const saved = localStorage.getItem('portfolioData');
     if (saved) {
       try {
+        const parsed = JSON.parse(saved);
         // eslint-disable-next-line react-hooks/set-state-in-effect
-        setData(JSON.parse(saved));
+        setData(prev => ({
+          ...defaultData,
+          ...parsed,
+          skills: parsed.skills || defaultData.skills,
+        }));
       } catch (e) {
         console.error("Failed to parse portfolio data");
       }
