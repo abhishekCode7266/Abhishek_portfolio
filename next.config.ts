@@ -8,40 +8,17 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: false,
   },
-  // Allow access to remote image placeholder.
   images: {
     remotePatterns: [
+      // Allows any HTTPS remote image (GitHub, Cloudinary, Unsplash, etc.)
+      {
+        protocol: 'https',
+        hostname: '**',
+      },
+      // Keeps HTTP/HTTPS fallback for local or specific placeholder services
       {
         protocol: 'https',
         hostname: 'picsum.photos',
-        port: '',
-        pathname: '/**',
-      },
-      // GitHub Avatars & Raw Assets (Common for portfolios)
-      {
-        protocol: 'https',
-        hostname: 'avatars.githubusercontent.com',
-        port: '',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'raw.githubusercontent.com',
-        port: '',
-        pathname: '/**',
-      },
-      // Unsplash
-      {
-        protocol: 'https',
-        hostname: 'images.unsplash.com',
-        port: '',
-        pathname: '/**',
-      },
-      // Res.cloudinary (if hosting your own project screenshots)
-      {
-        protocol: 'https',
-        hostname: 'res.cloudinary.com',
-        port: '',
         pathname: '/**',
       },
     ],
