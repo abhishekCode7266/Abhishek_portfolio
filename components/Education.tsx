@@ -38,11 +38,16 @@ export function Education() {
                     )}
                   </p>
                   
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 text-slate-500 text-sm">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 text-slate-500 text-sm flex-wrap">
                     <span className="flex items-center gap-2">
                       <Calendar size={16} className="text-indigo-500" />
-                      {edu.period}
+                      {edu.startDate} - {edu.endDate}
                     </span>
+                    {edu.percentage && (
+                      <span className="flex items-center gap-2 bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full font-medium">
+                        Percentage / CGPA: {edu.percentage}
+                      </span>
+                    )}
                     <span className="flex items-center gap-2">
                       <MapPin size={16} className="text-indigo-500" />
                       {edu.location}

@@ -326,8 +326,18 @@ export function PortfolioEditor() {
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                           <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Time Period</label>
-                           <input type="text" value={edu.period} onChange={e => handleArrayUpdate('education', idx, 'period', e.target.value)} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all" placeholder="e.g. 2024–2027" />
+                           <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Start Date</label>
+                           <input type="text" value={edu.startDate || ''} onChange={e => handleArrayUpdate('education', idx, 'startDate', e.target.value)} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all" placeholder="e.g. 2024" />
+                        </div>
+                        <div>
+                           <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">End Date</label>
+                           <input type="text" value={edu.endDate || ''} onChange={e => handleArrayUpdate('education', idx, 'endDate', e.target.value)} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all" placeholder="e.g. 2027 (or Present)" />
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                           <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Percentage / CGPA</label>
+                           <input type="text" value={edu.percentage || ''} onChange={e => handleArrayUpdate('education', idx, 'percentage', e.target.value)} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all" placeholder="e.g. 75% or 8.5 CGPA" />
                         </div>
                         <div>
                            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Location</label>
@@ -337,7 +347,7 @@ export function PortfolioEditor() {
                     </div>
                   </div>
                 ))}
-                <button onClick={() => handleArrayAdd('education', { id: Date.now().toString(), degree: '', institution: '', period: '', location: '' })} className="flex items-center justify-center gap-2 w-full border-2 border-dashed border-indigo-200 text-indigo-600 font-semibold hover:bg-indigo-50 py-4 rounded-2xl transition-colors">
+                <button onClick={() => handleArrayAdd('education', { id: Date.now().toString(), degree: '', institution: '', startDate: '', endDate: '', percentage: '', location: '' })} className="flex items-center justify-center gap-2 w-full border-2 border-dashed border-indigo-200 text-indigo-600 font-semibold hover:bg-indigo-50 py-4 rounded-2xl transition-colors">
                   <Plus size={18} /> Add Education Record (Degree, 12th, 10th)
                 </button>
               </div>

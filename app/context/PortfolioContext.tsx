@@ -32,7 +32,9 @@ export type Education = {
   id: string;
   degree: string;
   institution: string;
-  period: string;
+  startDate: string;
+  endDate: string;
+  percentage: string;
   location: string;
 };
 
@@ -79,7 +81,9 @@ const defaultData: PortfolioData = {
       id: "1",
       degree: "B.Tech – Computer Science",
       institution: "LDC Institute of Technical Studies (Affiliated with AKTU)",
-      period: "7th Semester (2024–2027)",
+      startDate: "2024",
+      endDate: "2027",
+      percentage: "75%",
       location: "Uttar Pradesh, India"
     }
   ],
