@@ -4,6 +4,7 @@ import { motion } from 'motion/react';
 import { Github, Linkedin, Mail, Upload, Download, ArrowDown, Facebook, Instagram, MessageCircle, Send, Twitter, Youtube } from 'lucide-react';
 import { usePortfolio } from '@/app/context/PortfolioContext';
 import Image from 'next/image';
+import { formatUrl } from '@/lib/utils';
 
 export function Hero() {
   const { data, updateData } = usePortfolio();
@@ -82,10 +83,10 @@ export function Hero() {
           </div>
 
           <div className="flex flex-wrap gap-4 mt-4">
-            <a href={data.socialLinks?.github || "#"} target="_blank" rel="noreferrer" className="p-3 text-slate-500 hover:text-indigo-600 hover:-translate-y-1 transition-all bg-white rounded-full shadow-sm border border-slate-100">
+            <a href={formatUrl(data.socialLinks?.github)} target="_blank" rel="noreferrer" className="p-3 text-slate-500 hover:text-indigo-600 hover:-translate-y-1 transition-all bg-white rounded-full shadow-sm border border-slate-100">
               <Github size={22} />
             </a>
-            <a href={data.socialLinks?.linkedin || "#"} target="_blank" rel="noreferrer" className="p-3 text-slate-500 hover:text-indigo-600 hover:-translate-y-1 transition-all bg-white rounded-full shadow-sm border border-slate-100">
+            <a href={formatUrl(data.socialLinks?.linkedin)} target="_blank" rel="noreferrer" className="p-3 text-slate-500 hover:text-indigo-600 hover:-translate-y-1 transition-all bg-white rounded-full shadow-sm border border-slate-100">
               <Linkedin size={22} />
             </a>
             {data.socialLinks?.whatsapp && (
@@ -94,27 +95,27 @@ export function Hero() {
               </a>
             )}
             {data.socialLinks?.telegram && (
-              <a href={data.socialLinks.telegram} target="_blank" rel="noreferrer" className="p-3 text-slate-500 hover:text-blue-500 hover:-translate-y-1 transition-all bg-white rounded-full shadow-sm border border-slate-100" title="Telegram">
+              <a href={formatUrl(data.socialLinks.telegram)} target="_blank" rel="noreferrer" className="p-3 text-slate-500 hover:text-blue-500 hover:-translate-y-1 transition-all bg-white rounded-full shadow-sm border border-slate-100" title="Telegram">
                 <Send size={22} />
               </a>
             )}
             {data.socialLinks?.instagram && (
-              <a href={data.socialLinks.instagram} target="_blank" rel="noreferrer" className="p-3 text-slate-500 hover:text-pink-600 hover:-translate-y-1 transition-all bg-white rounded-full shadow-sm border border-slate-100" title="Instagram">
+              <a href={formatUrl(data.socialLinks.instagram)} target="_blank" rel="noreferrer" className="p-3 text-slate-500 hover:text-pink-600 hover:-translate-y-1 transition-all bg-white rounded-full shadow-sm border border-slate-100" title="Instagram">
                 <Instagram size={22} />
               </a>
             )}
             {data.socialLinks?.facebook && (
-              <a href={data.socialLinks.facebook} target="_blank" rel="noreferrer" className="p-3 text-slate-500 hover:text-blue-600 hover:-translate-y-1 transition-all bg-white rounded-full shadow-sm border border-slate-100" title="Facebook">
+              <a href={formatUrl(data.socialLinks.facebook)} target="_blank" rel="noreferrer" className="p-3 text-slate-500 hover:text-blue-600 hover:-translate-y-1 transition-all bg-white rounded-full shadow-sm border border-slate-100" title="Facebook">
                 <Facebook size={22} />
               </a>
             )}
             {data.socialLinks?.twitter && (
-              <a href={data.socialLinks.twitter} target="_blank" rel="noreferrer" className="p-3 text-slate-500 hover:text-sky-500 hover:-translate-y-1 transition-all bg-white rounded-full shadow-sm border border-slate-100" title="Twitter / X">
+              <a href={formatUrl(data.socialLinks.twitter)} target="_blank" rel="noreferrer" className="p-3 text-slate-500 hover:text-sky-500 hover:-translate-y-1 transition-all bg-white rounded-full shadow-sm border border-slate-100" title="Twitter / X">
                 <Twitter size={22} />
               </a>
             )}
             {data.socialLinks?.youtube && (
-              <a href={data.socialLinks.youtube} target="_blank" rel="noreferrer" className="p-3 text-slate-500 hover:text-red-600 hover:-translate-y-1 transition-all bg-white rounded-full shadow-sm border border-slate-100" title="YouTube">
+              <a href={formatUrl(data.socialLinks.youtube)} target="_blank" rel="noreferrer" className="p-3 text-slate-500 hover:text-red-600 hover:-translate-y-1 transition-all bg-white rounded-full shadow-sm border border-slate-100" title="YouTube">
                 <Youtube size={22} />
               </a>
             )}
@@ -131,7 +132,7 @@ export function Hero() {
           className="flex justify-center order-1 lg:order-2 lg:justify-end"
         >
           <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
-            <div className="w-64 h-64 sm:w-80 sm:h-80 lg:w-96 lg:h-96 rounded-full overflow-hidden border-8 border-white shadow-2xl bg-slate-200 relative transition-transform duration-300 group-hover:scale-[1.02]">
+            <div className="w-56 h-56 sm:w-64 sm:h-64 lg:w-80 lg:h-80 rounded-full overflow-hidden border-8 border-white shadow-2xl bg-slate-200 relative transition-transform duration-300 group-hover:scale-[1.02]">
               {data.profileImage ? (
                 <Image src={data.profileImage} alt="Abhishek Singh Yadav" fill className="object-cover" referrerPolicy="no-referrer" />
               ) : (

@@ -4,6 +4,7 @@ import { motion } from 'motion/react';
 import { SectionHeading } from './SectionHeading';
 import { MapPin, Mail, Github, Linkedin, Send, CheckCircle2, Loader2, Facebook, Instagram, MessageCircle, Twitter, Youtube } from 'lucide-react';
 import { usePortfolio } from '@/app/context/PortfolioContext';
+import { formatUrl } from '@/lib/utils';
 
 export function Contact() {
   const { data } = usePortfolio();
@@ -69,10 +70,10 @@ export function Contact() {
             <div className="mt-4 pt-8 border-t border-slate-100">
               <h4 className="text-sm font-semibold text-slate-900 uppercase tracking-wider mb-4">Social Profiles</h4>
               <div className="flex flex-wrap gap-4">
-                <a href={data.socialLinks?.github || "#"} target="_blank" rel="noreferrer" className="p-3 bg-slate-50 text-slate-600 hover:text-white hover:bg-indigo-600 rounded-xl transition-all">
+                <a href={formatUrl(data.socialLinks?.github)} target="_blank" rel="noreferrer" className="p-3 bg-slate-50 text-slate-600 hover:text-white hover:bg-indigo-600 rounded-xl transition-all">
                   <Github size={20} />
                 </a>
-                <a href={data.socialLinks?.linkedin || "#"} target="_blank" rel="noreferrer" className="p-3 bg-slate-50 text-slate-600 hover:text-white hover:bg-indigo-600 rounded-xl transition-all">
+                <a href={formatUrl(data.socialLinks?.linkedin)} target="_blank" rel="noreferrer" className="p-3 bg-slate-50 text-slate-600 hover:text-white hover:bg-indigo-600 rounded-xl transition-all">
                   <Linkedin size={20} />
                 </a>
                 {data.socialLinks?.whatsapp && (
@@ -81,27 +82,27 @@ export function Contact() {
                   </a>
                 )}
                 {data.socialLinks?.telegram && (
-                  <a href={data.socialLinks.telegram} target="_blank" rel="noreferrer" className="p-3 bg-slate-50 text-slate-600 hover:text-white hover:bg-blue-500 rounded-xl transition-all" title="Telegram">
+                  <a href={formatUrl(data.socialLinks.telegram)} target="_blank" rel="noreferrer" className="p-3 bg-slate-50 text-slate-600 hover:text-white hover:bg-blue-500 rounded-xl transition-all" title="Telegram">
                     <Send size={20} />
                   </a>
                 )}
                 {data.socialLinks?.instagram && (
-                  <a href={data.socialLinks.instagram} target="_blank" rel="noreferrer" className="p-3 bg-slate-50 text-slate-600 hover:text-white hover:bg-pink-600 rounded-xl transition-all" title="Instagram">
+                  <a href={formatUrl(data.socialLinks.instagram)} target="_blank" rel="noreferrer" className="p-3 bg-slate-50 text-slate-600 hover:text-white hover:bg-pink-600 rounded-xl transition-all" title="Instagram">
                     <Instagram size={20} />
                   </a>
                 )}
                 {data.socialLinks?.facebook && (
-                  <a href={data.socialLinks.facebook} target="_blank" rel="noreferrer" className="p-3 bg-slate-50 text-slate-600 hover:text-white hover:bg-blue-600 rounded-xl transition-all" title="Facebook">
+                  <a href={formatUrl(data.socialLinks.facebook)} target="_blank" rel="noreferrer" className="p-3 bg-slate-50 text-slate-600 hover:text-white hover:bg-blue-600 rounded-xl transition-all" title="Facebook">
                     <Facebook size={20} />
                   </a>
                 )}
                 {data.socialLinks?.twitter && (
-                  <a href={data.socialLinks.twitter} target="_blank" rel="noreferrer" className="p-3 bg-slate-50 text-slate-600 hover:text-white hover:bg-sky-500 rounded-xl transition-all" title="Twitter / X">
+                  <a href={formatUrl(data.socialLinks.twitter)} target="_blank" rel="noreferrer" className="p-3 bg-slate-50 text-slate-600 hover:text-white hover:bg-sky-500 rounded-xl transition-all" title="Twitter / X">
                     <Twitter size={20} />
                   </a>
                 )}
                 {data.socialLinks?.youtube && (
-                  <a href={data.socialLinks.youtube} target="_blank" rel="noreferrer" className="p-3 bg-slate-50 text-slate-600 hover:text-white hover:bg-red-600 rounded-xl transition-all" title="YouTube">
+                  <a href={formatUrl(data.socialLinks.youtube)} target="_blank" rel="noreferrer" className="p-3 bg-slate-50 text-slate-600 hover:text-white hover:bg-red-600 rounded-xl transition-all" title="YouTube">
                     <Youtube size={20} />
                   </a>
                 )}

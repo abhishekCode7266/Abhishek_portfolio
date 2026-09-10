@@ -4,6 +4,7 @@ import { SectionHeading } from './SectionHeading';
 import { Github, Folder, ExternalLink, Globe } from 'lucide-react';
 import { usePortfolio } from '@/app/context/PortfolioContext';
 import Image from 'next/image';
+import { formatUrl } from '@/lib/utils';
 
 export function Projects() {
   const { data } = usePortfolio();
@@ -45,12 +46,12 @@ export function Projects() {
                 </div>
                 
                 <div className="flex flex-wrap items-center gap-4">
-                  <a href={featuredProject.github} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-6 py-3 bg-white text-slate-900 font-semibold rounded-xl hover:bg-indigo-50 transition-colors">
+                  <a href={formatUrl(featuredProject.github)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-6 py-3 bg-white text-slate-900 font-semibold rounded-xl hover:bg-indigo-50 transition-colors">
                     <Github size={20} />
                     View Source
                   </a>
                   {featuredProject.demoUrl && (
-                    <a href={featuredProject.demoUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-6 py-3 bg-slate-800 text-white font-semibold rounded-xl hover:bg-slate-700 transition-colors border border-slate-700">
+                    <a href={formatUrl(featuredProject.demoUrl)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-6 py-3 bg-slate-800 text-white font-semibold rounded-xl hover:bg-slate-700 transition-colors border border-slate-700">
                       <Globe size={20} />
                       Live Demo
                     </a>
@@ -114,9 +115,9 @@ export function Projects() {
                   <Folder size={28} />
                 </div>
                 <div className="flex gap-3 text-slate-400">
-                  <a href={project.github} target="_blank" rel="noreferrer" className="hover:text-indigo-600 transition-colors"><Github size={20} /></a>
+                  <a href={formatUrl(project.github)} target="_blank" rel="noreferrer" className="hover:text-indigo-600 transition-colors"><Github size={20} /></a>
                   {project.demoUrl && (
-                    <a href={project.demoUrl} target="_blank" rel="noreferrer" className="hover:text-indigo-600 transition-colors"><ExternalLink size={20} /></a>
+                    <a href={formatUrl(project.demoUrl)} target="_blank" rel="noreferrer" className="hover:text-indigo-600 transition-colors"><ExternalLink size={20} /></a>
                   )}
                 </div>
               </div>

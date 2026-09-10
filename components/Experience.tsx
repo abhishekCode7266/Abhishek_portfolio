@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { SectionHeading } from './SectionHeading';
 import { Briefcase, Building2, Calendar, Search } from 'lucide-react';
 import { usePortfolio } from '@/app/context/PortfolioContext';
+import { formatUrl } from '@/lib/utils';
 
 export function Experience() {
   const { data } = usePortfolio();
@@ -53,7 +54,7 @@ export function Experience() {
                     {exp.certificateUrl && (
                       <div className="mt-4">
                         <a 
-                          href={exp.certificateUrl} 
+                          href={formatUrl(exp.certificateUrl)} 
                           target="_blank" 
                           rel="noreferrer"
                           className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 font-medium text-sm rounded-lg transition-colors shadow-sm"

@@ -199,7 +199,7 @@ interface PortfolioContextType {
   data: PortfolioData;
   updateData: (newData: Partial<PortfolioData>) => void;
   isEditorOpen: boolean;
-  setIsEditorOpen: (isOpen: boolean) => void;
+  setIsEditorOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const PortfolioContext = createContext<PortfolioContextType | undefined>(undefined);

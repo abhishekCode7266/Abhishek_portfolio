@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { SectionHeading } from './SectionHeading';
 import { Plus, Award, ExternalLink, FileText } from 'lucide-react';
 import { usePortfolio } from '@/app/context/PortfolioContext';
+import { formatUrl } from '@/lib/utils';
 
 export function Certifications() {
   const { data } = usePortfolio();
@@ -36,7 +37,7 @@ export function Certifications() {
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-slate-400">{cert.date}</span>
                   {cert.link && (
-                    <a href={cert.link} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors">
+                    <a href={formatUrl(cert.link)} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors">
                       Verify <ExternalLink size={14} />
                     </a>
                   )}

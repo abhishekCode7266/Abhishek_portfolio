@@ -1,6 +1,7 @@
 'use client';
 import { Github, Linkedin, Mail, Facebook, Instagram, MessageCircle, Send, Twitter, Youtube } from 'lucide-react';
 import { usePortfolio } from '@/app/context/PortfolioContext';
+import { formatUrl } from '@/lib/utils';
 
 export function Footer() {
   const { data } = usePortfolio();
@@ -14,10 +15,10 @@ export function Footer() {
             <p className="text-sm max-w-sm">Designing and building modern digital experiences. Available for new opportunities.</p>
           </div>
           <div className="flex flex-wrap gap-5">
-            <a href={data.socialLinks?.github || "#"} target="_blank" rel="noreferrer" className="hover:text-white transition-colors">
+            <a href={formatUrl(data.socialLinks?.github)} target="_blank" rel="noreferrer" className="hover:text-white transition-colors">
               <Github size={20} />
             </a>
-            <a href={data.socialLinks?.linkedin || "#"} target="_blank" rel="noreferrer" className="hover:text-white transition-colors">
+            <a href={formatUrl(data.socialLinks?.linkedin)} target="_blank" rel="noreferrer" className="hover:text-white transition-colors">
               <Linkedin size={20} />
             </a>
             {data.socialLinks?.whatsapp && (
@@ -26,27 +27,27 @@ export function Footer() {
               </a>
             )}
             {data.socialLinks?.telegram && (
-              <a href={data.socialLinks.telegram} target="_blank" rel="noreferrer" className="hover:text-white transition-colors" title="Telegram">
+              <a href={formatUrl(data.socialLinks.telegram)} target="_blank" rel="noreferrer" className="hover:text-white transition-colors" title="Telegram">
                 <Send size={20} />
               </a>
             )}
             {data.socialLinks?.instagram && (
-              <a href={data.socialLinks.instagram} target="_blank" rel="noreferrer" className="hover:text-white transition-colors" title="Instagram">
+              <a href={formatUrl(data.socialLinks.instagram)} target="_blank" rel="noreferrer" className="hover:text-white transition-colors" title="Instagram">
                 <Instagram size={20} />
               </a>
             )}
             {data.socialLinks?.facebook && (
-              <a href={data.socialLinks.facebook} target="_blank" rel="noreferrer" className="hover:text-white transition-colors" title="Facebook">
+              <a href={formatUrl(data.socialLinks.facebook)} target="_blank" rel="noreferrer" className="hover:text-white transition-colors" title="Facebook">
                 <Facebook size={20} />
               </a>
             )}
             {data.socialLinks?.twitter && (
-              <a href={data.socialLinks.twitter} target="_blank" rel="noreferrer" className="hover:text-white transition-colors" title="Twitter / X">
+              <a href={formatUrl(data.socialLinks.twitter)} target="_blank" rel="noreferrer" className="hover:text-white transition-colors" title="Twitter / X">
                 <Twitter size={20} />
               </a>
             )}
             {data.socialLinks?.youtube && (
-              <a href={data.socialLinks.youtube} target="_blank" rel="noreferrer" className="hover:text-white transition-colors" title="YouTube">
+              <a href={formatUrl(data.socialLinks.youtube)} target="_blank" rel="noreferrer" className="hover:text-white transition-colors" title="YouTube">
                 <Youtube size={20} />
               </a>
             )}

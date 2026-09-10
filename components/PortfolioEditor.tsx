@@ -1,14 +1,27 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { usePortfolio } from '@/app/context/PortfolioContext';
-import { Settings, X, Plus, Trash2, Upload, FileText } from 'lucide-react';
+import { Settings, X, Plus, Trash2, Upload, FileText, Image as ImageIcon } from 'lucide-react';
 
 const TABS = ['General', 'About', 'Skills', 'Education', 'Experience & Internships', 'Projects', 'Certifications'];
 
 export function PortfolioEditor() {
   const { data, updateData, isEditorOpen, setIsEditorOpen } = usePortfolio();
   const [activeTab, setActiveTab] = useState('General');
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl/Cmd + Shift + E to toggle the editor
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'e') {
+        e.preventDefault();
+        setIsEditorOpen(prev => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [setIsEditorOpen]);
 
   if (!isEditorOpen) {
     return (
@@ -53,7 +66,7 @@ export function PortfolioEditor() {
               <h2 className="font-bold text-slate-800 text-lg">Portfolio Editor</h2>
               <p className="text-xs text-slate-500">Update your content</p>
             </div>
-            <button onClick={() => setIsEditorOpen(false)} className="md:hidden p-2 text-slate-500 bg-slate-200 rounded-full hover:bg-slate-300 transition-colors"><X size={16}/></button>
+            <button onClick={() => setIsEditorOpen(false)} className="p-2 text-slate-500 bg-slate-200 rounded-full hover:bg-slate-300 transition-colors" title="Close"><X size={16}/></button>
           </div>
           {TABS.map(tab => (
             <button 
@@ -68,19 +81,61 @@ export function PortfolioEditor() {
 
         {/* Content Area */}
         <div className="flex-1 p-6 md:p-10 overflow-y-auto bg-white relative flex flex-col">
-          <div className="flex items-center justify-between mb-8 pb-4 border-b border-slate-100 shrink-0">
+          <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 pb-4 border-b border-slate-100 shrink-0 gap-4">
             <h3 className="text-2xl font-bold text-slate-800">{activeTab}</h3>
-            <button 
-              onClick={() => setIsEditorOpen(false)} 
-              className="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 transition-colors shadow-sm"
-            >
-              Save & Close
-            </button>
+            <div className="flex items-center gap-4 flex-wrap">
+              {/* Global Profile Image Upload */}
+              <div className="flex items-center gap-3 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200">
+                {data.profileImage ? (
+                  <div className="w-8 h-8 rounded-full overflow-hidden border border-indigo-100 shrink-0">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={data.profileImage} alt="Profile" className="w-full h-full object-cover" />
+                  </div>
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-400 shrink-0">
+                    <ImageIcon size={14} />
+                  </div>
+                )}
+                <label className="cursor-pointer text-sm font-semibold text-indigo-600 hover:text-indigo-700 transition-colors whitespace-nowrap">
+                  Upload Profile
+                  <input 
+                    type="file" 
+                    accept="image/*"
+                    className="hidden" 
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onloadend = () => updateData({ profileImage: reader.result as string });
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                  />
+                </label>
+                {data.profileImage && (
+                  <button 
+                    onClick={() => updateData({ profileImage: null })}
+                    className="text-red-500 hover:text-red-700 p-1"
+                    title="Remove Image"
+                  >
+                    <X size={16} />
+                  </button>
+                )}
+              </div>
+
+              <button 
+                onClick={() => setIsEditorOpen(false)} 
+                className="flex items-center gap-2 px-6 py-2 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 transition-colors shadow-sm shrink-0"
+              >
+                Save & Close
+              </button>
+            </div>
           </div>
 
           <div className="space-y-8 max-w-3xl flex-1 pb-10">
             {activeTab === 'General' && (
               <div className="space-y-6">
+
                 <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
                   <h4 className="text-sm font-semibold text-slate-800 mb-2">Resume Upload</h4>
                   <p className="text-sm text-slate-500 mb-4">Upload your resume PDF to make the &quot;Download Resume&quot; button functional.</p>
