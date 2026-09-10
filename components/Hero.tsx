@@ -2,11 +2,11 @@
 import { useRef } from 'react';
 import { motion } from 'motion/react';
 import { Github, Linkedin, Mail, Upload, Download, ArrowDown } from 'lucide-react';
-import { useProfile } from '@/app/context/ProfileContext';
+import { usePortfolio } from '@/app/context/PortfolioContext';
 import Image from 'next/image';
 
 export function Hero() {
-  const { profileImage, setProfileImage } = useProfile();
+  const { data, updateData } = usePortfolio();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -14,7 +14,7 @@ export function Hero() {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setProfileImage(reader.result as string);
+        updateData({ profileImage: reader.result as string });
       };
       reader.readAsDataURL(file);
     }
@@ -61,20 +61,34 @@ export function Hero() {
               View Projects
               <ArrowDown size={18} />
             </a>
-            <a href="#" className="inline-flex items-center gap-2 px-6 py-3 bg-white text-slate-700 font-medium rounded-xl hover:bg-slate-50 transition-colors shadow-sm border border-slate-200">
+            <a 
+              href={data.resumeUrl || "#"} 
+              download={data.resumeUrl ? data.resumeName || "Resume.pdf" : undefined}
+              className={`inline-flex items-center gap-2 px-6 py-3 font-medium rounded-xl transition-colors shadow-sm border ${
+                data.resumeUrl 
+                  ? "bg-white text-slate-700 hover:bg-slate-50 border-slate-200" 
+                  : "bg-slate-50 text-slate-400 border-slate-100 cursor-not-allowed"
+              }`}
+              onClick={(e) => {
+                if (!data.resumeUrl) {
+                  e.preventDefault();
+                  alert("Please upload your resume via the Edit Portfolio button in the bottom right corner.");
+                }
+              }}
+            >
               <Download size={18} />
               Download Resume
             </a>
           </div>
 
           <div className="flex gap-4 mt-4">
-            <a href="https://github.com" target="_blank" rel="noreferrer" className="p-3 text-slate-500 hover:text-indigo-600 hover:-translate-y-1 transition-all bg-white rounded-full shadow-sm border border-slate-100">
+            <a href={data.socialLinks?.github || "#"} target="_blank" rel="noreferrer" className="p-3 text-slate-500 hover:text-indigo-600 hover:-translate-y-1 transition-all bg-white rounded-full shadow-sm border border-slate-100">
               <Github size={22} />
             </a>
-            <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="p-3 text-slate-500 hover:text-indigo-600 hover:-translate-y-1 transition-all bg-white rounded-full shadow-sm border border-slate-100">
+            <a href={data.socialLinks?.linkedin || "#"} target="_blank" rel="noreferrer" className="p-3 text-slate-500 hover:text-indigo-600 hover:-translate-y-1 transition-all bg-white rounded-full shadow-sm border border-slate-100">
               <Linkedin size={22} />
             </a>
-            <a href="mailto:abhisheksoraon9@gmail.com" className="p-3 text-slate-500 hover:text-indigo-600 hover:-translate-y-1 transition-all bg-white rounded-full shadow-sm border border-slate-100">
+            <a href={data.socialLinks?.email ? `mailto:${data.socialLinks.email}` : "#"} className="p-3 text-slate-500 hover:text-indigo-600 hover:-translate-y-1 transition-all bg-white rounded-full shadow-sm border border-slate-100">
               <Mail size={22} />
             </a>
           </div>
@@ -88,8 +102,8 @@ export function Hero() {
         >
           <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
             <div className="w-64 h-64 sm:w-80 sm:h-80 lg:w-96 lg:h-96 rounded-full overflow-hidden border-8 border-white shadow-2xl bg-slate-200 relative transition-transform duration-300 group-hover:scale-[1.02]">
-              {profileImage ? (
-                <Image src={profileImage} alt="Abhishek Singh Yadav" fill className="object-cover" referrerPolicy="no-referrer" />
+              {data.profileImage ? (
+                <Image src={data.profileImage} alt="Abhishek Singh Yadav" fill className="object-cover" referrerPolicy="no-referrer" />
               ) : (
                 <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 bg-indigo-50">
                   <Upload size={48} className="mb-4 text-indigo-300" />

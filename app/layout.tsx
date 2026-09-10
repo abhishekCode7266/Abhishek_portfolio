@@ -1,6 +1,6 @@
 import type {Metadata} from 'next';
 import './globals.css'; // Global styles
-import { ProfileProvider } from '@/app/context/ProfileContext';
+import { PortfolioProvider } from '@/app/context/PortfolioContext';
 
 export const metadata: Metadata = {
   title: 'Abhishek Singh Yadav | Portfolio',
@@ -21,9 +21,9 @@ export default function RootLayout({children}: {children: React.ReactNode}) {
   return (
     <html lang="en">
       <body suppressHydrationWarning className="bg-[#f4f7fa] text-slate-900">
-        <ProfileProvider>
+        <PortfolioProvider>
           {children}
-        </ProfileProvider>
+        </PortfolioProvider>
       </body>
     </html>
   );

@@ -1,8 +1,12 @@
 'use client';
 import { motion } from 'motion/react';
 import { SectionHeading } from './SectionHeading';
+import { usePortfolio } from '@/app/context/PortfolioContext';
 
 export function About() {
+  const { data } = usePortfolio();
+  const paragraphs = data.aboutBio.split('\n').filter(p => p.trim() !== '');
+
   return (
     <section id="about" className="py-24 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -15,21 +19,26 @@ export function About() {
             viewport={{ once: true, margin: "-100px" }}
             className="prose prose-slate lg:prose-lg text-slate-600 leading-relaxed"
           >
-            <p>
-              I am a 7th-semester B.Tech Computer Science student at the 
-              <strong> LDC Institute of Technical Studies</strong>, affiliated with 
-              Dr. A.P.J. Abdul Kalam Technical University (AKTU).
-            </p>
-            <p className="mt-4">
-              With a strong foundation in computer science principles, I have a deep interest in 
-              software development, frontend development, and real-world problem solving. My 
-              technical toolkit primarily revolves around <strong>Python, Java, and JavaScript</strong>.
-            </p>
-            <p className="mt-4">
-              I love turning complex problems into elegant, functional, and user-friendly software 
-              solutions. Currently, I am actively seeking internship opportunities to apply my 
-              knowledge in a professional environment and continue growing as a developer.
-            </p>
+            {paragraphs.map((p, i) => (
+              <p key={i} className={i > 0 ? "mt-4" : ""}>
+                {/* Minor parsing to keep bolded text for initial data */}
+                {p.includes("LDC Institute of Technical Studies") && i === 0 ? (
+                  <>
+                    I am a 7th-semester B.Tech Computer Science student at the 
+                    <strong> LDC Institute of Technical Studies</strong>, affiliated with 
+                    Dr. A.P.J. Abdul Kalam Technical University (AKTU).
+                  </>
+                ) : p.includes("Python, Java, and JavaScript") && i === 1 ? (
+                  <>
+                    With a strong foundation in computer science principles, I have a deep interest in 
+                    software development, frontend development, and real-world problem solving. My 
+                    technical toolkit primarily revolves around <strong>Python, Java, and JavaScript</strong>.
+                  </>
+                ) : (
+                  p
+                )}
+              </p>
+            ))}
           </motion.div>
 
           <motion.div 

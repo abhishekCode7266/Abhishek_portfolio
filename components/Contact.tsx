@@ -3,8 +3,10 @@ import { useState } from 'react';
 import { motion } from 'motion/react';
 import { SectionHeading } from './SectionHeading';
 import { MapPin, Mail, Github, Linkedin, Send, CheckCircle2, Loader2 } from 'lucide-react';
+import { usePortfolio } from '@/app/context/PortfolioContext';
 
 export function Contact() {
+  const { data } = usePortfolio();
   const [formStatus, setFormStatus] = useState<'idle' | 'loading' | 'success'>('idle');
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -47,8 +49,8 @@ export function Contact() {
                 </div>
                 <div>
                   <h4 className="text-sm font-semibold text-slate-900 uppercase tracking-wider mb-1">Email</h4>
-                  <a href="mailto:abhisheksoraon9@gmail.com" className="text-slate-600 hover:text-indigo-600 transition-colors">
-                    abhisheksoraon9@gmail.com
+                  <a href={data.socialLinks?.email ? `mailto:${data.socialLinks.email}` : "#"} className="text-slate-600 hover:text-indigo-600 transition-colors">
+                    {data.socialLinks?.email || "Email address"}
                   </a>
                 </div>
               </div>
@@ -67,10 +69,10 @@ export function Contact() {
             <div className="mt-4 pt-8 border-t border-slate-100">
               <h4 className="text-sm font-semibold text-slate-900 uppercase tracking-wider mb-4">Social Profiles</h4>
               <div className="flex gap-4">
-                <a href="https://github.com" target="_blank" rel="noreferrer" className="p-3 bg-slate-50 text-slate-600 hover:text-white hover:bg-indigo-600 rounded-xl transition-all">
+                <a href={data.socialLinks?.github || "#"} target="_blank" rel="noreferrer" className="p-3 bg-slate-50 text-slate-600 hover:text-white hover:bg-indigo-600 rounded-xl transition-all">
                   <Github size={20} />
                 </a>
-                <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="p-3 bg-slate-50 text-slate-600 hover:text-white hover:bg-indigo-600 rounded-xl transition-all">
+                <a href={data.socialLinks?.linkedin || "#"} target="_blank" rel="noreferrer" className="p-3 bg-slate-50 text-slate-600 hover:text-white hover:bg-indigo-600 rounded-xl transition-all">
                   <Linkedin size={20} />
                 </a>
               </div>

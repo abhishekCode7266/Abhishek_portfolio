@@ -1,16 +1,47 @@
 'use client';
 import { motion } from 'motion/react';
 import { SectionHeading } from './SectionHeading';
-import { Plus } from 'lucide-react';
+import { Plus, Award, ExternalLink } from 'lucide-react';
+import { usePortfolio } from '@/app/context/PortfolioContext';
 
 export function Certifications() {
+  const { data } = usePortfolio();
+
   return (
     <section id="certifications" className="py-24 bg-[#f4f7fa]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionHeading>Certifications</SectionHeading>
         
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {/* Active Certifications would go here when available */}
+          
+          {data.certifications.map((cert, idx) => (
+            <motion.div 
+              key={cert.id}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: idx * 0.1 }}
+              className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm hover:shadow-xl hover:border-indigo-100 transition-all group flex flex-col h-full"
+            >
+              <div className="flex justify-between items-start mb-6">
+                <div className="p-3 bg-indigo-50 rounded-xl text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                  <Award size={28} />
+                </div>
+              </div>
+              
+              <h4 className="text-xl font-bold text-slate-800 mb-2 group-hover:text-indigo-600 transition-colors">{cert.name}</h4>
+              <p className="text-slate-600 mb-6">{cert.issuer}</p>
+              
+              <div className="flex items-center justify-between mt-auto pt-6 border-t border-slate-50">
+                <span className="text-sm font-medium text-slate-400">{cert.date}</span>
+                {cert.link && (
+                  <a href={cert.link} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors">
+                    Verify <ExternalLink size={14} />
+                  </a>
+                )}
+              </div>
+            </motion.div>
+          ))}
           
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}

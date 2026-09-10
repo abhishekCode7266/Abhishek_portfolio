@@ -8,6 +8,7 @@ import { Projects } from '@/components/Projects';
 import { Certifications } from '@/components/Certifications';
 import { Contact } from '@/components/Contact';
 import { Footer } from '@/components/Footer';
+import { PortfolioEditor } from '@/components/PortfolioEditor';
 
 export default function Home() {
   return (
@@ -22,6 +23,7 @@ export default function Home() {
       <Certifications />
       <Contact />
       <Footer />
+      <PortfolioEditor />
     </main>
   );
 }
