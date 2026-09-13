@@ -30,6 +30,14 @@ export function Certifications() {
                 </div>
               </div>
               
+              {/* Show uploaded image if exists */}
+              {cert.fileUrl && cert.fileUrl.startsWith('data:image') && (
+                <div className="relative w-full h-40 mb-6 rounded-2xl overflow-hidden border border-slate-100 bg-slate-50">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={cert.fileUrl} alt={cert.name} className="object-cover w-full h-full" />
+                </div>
+              )}
+
               <h4 className="text-xl font-bold text-slate-800 mb-2 group-hover:text-indigo-600 transition-colors">{cert.name}</h4>
               <p className="text-slate-600 mb-6">{cert.issuer}</p>
               
@@ -42,8 +50,8 @@ export function Certifications() {
                     </a>
                   )}
                 </div>
-                {cert.fileUrl && (
-                  <a href={cert.fileUrl} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-2 w-full py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 text-sm font-medium rounded-xl transition-colors border border-slate-200">
+                {cert.fileUrl && !cert.fileUrl.startsWith('data:image') && (
+                  <a href={cert.fileUrl} download={`${cert.name}-certificate.pdf`} className="flex items-center justify-center gap-2 w-full py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 text-sm font-medium rounded-xl transition-colors border border-slate-200">
                     <FileText size={16} /> View Certificate
                   </a>
                 )}

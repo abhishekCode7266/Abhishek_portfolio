@@ -82,17 +82,19 @@ export function Projects() {
               transition={{ delay: idx * 0.1 }}
               className="bg-white rounded-3xl p-8 border border-slate-100 shadow-sm hover:shadow-xl hover:border-indigo-100 transition-all group flex flex-col h-full relative overflow-hidden"
             >
-              {project.imageUrl && (
-                <div className="absolute inset-0 opacity-5 group-hover:opacity-10 transition-opacity pointer-events-none">
-                  <Image src={project.imageUrl} alt="" fill className="object-cover blur-sm" referrerPolicy="no-referrer" />
-                </div>
-              )}
-              
-              <div className="relative z-10 flex justify-between items-start mb-6">
+              <div className="relative z-10 flex justify-between items-start mb-4">
                 <div className="p-3 bg-indigo-50 rounded-xl text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
                   <Folder size={28} />
                 </div>
               </div>
+
+              {project.github && (
+                <div className="relative z-10 w-full h-32 mb-6 rounded-xl border border-slate-700 overflow-hidden bg-[#1e1e1e] shadow-inner group-hover:border-indigo-500/50 transition-colors">
+                  <div className="absolute inset-0 scale-[0.6] origin-top-left w-[166.66%] h-[166.66%]">
+                     <GithubCodeSnippet githubUrl={project.github} />
+                  </div>
+                </div>
+              )}
               
               <h4 className="relative z-10 text-xl font-bold text-slate-800 mb-3 group-hover:text-indigo-600 transition-colors">{project.title}</h4>
               <p className="relative z-10 text-slate-600 leading-relaxed mb-6 flex-1">{project.description}</p>
