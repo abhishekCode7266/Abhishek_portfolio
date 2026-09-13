@@ -32,9 +32,9 @@ export function Certifications() {
               
               {/* Show uploaded image if exists */}
               {cert.fileUrl && cert.fileUrl.startsWith('data:image') && (
-                <div className="relative w-full h-40 mb-6 rounded-2xl overflow-hidden border border-slate-100 bg-slate-50">
+                <div className="relative w-full h-48 mb-6 rounded-2xl overflow-hidden border border-slate-200 bg-white shadow-sm flex items-center justify-center p-2">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={cert.fileUrl} alt={cert.name} className="object-cover w-full h-full" />
+                  <img src={cert.fileUrl} alt={cert.name} className="object-contain w-full h-full" />
                 </div>
               )}
 
@@ -44,8 +44,8 @@ export function Certifications() {
               <div className="flex flex-col gap-3 mt-auto pt-6 border-t border-slate-50">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-slate-400">{cert.date}</span>
-                  {cert.link && (
-                    <a href={formatUrl(cert.link)} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors">
+                  {(cert.link || cert.fileUrl) && (
+                    <a href={cert.link ? formatUrl(cert.link) : cert.fileUrl} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors">
                       Verify <ExternalLink size={14} />
                     </a>
                   )}
