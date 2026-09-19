@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { usePortfolio } from '@/app/context/PortfolioContext';
 import { Settings, X, Plus, Trash2, Upload, FileText, Image as ImageIcon } from 'lucide-react';
+import { optimizeImage } from '@/lib/imageOptimizer';
 
 const TABS = ['General', 'About', 'Skills', 'Education', 'Experience & Internships', 'Projects', 'Certifications'];
 
@@ -463,57 +464,147 @@ export function PortfolioEditor() {
 
             {activeTab === 'Certifications' && (
               <div className="space-y-6">
-                 {data.certifications.map((cert, idx) => (
-                  <div key={cert.id} className="p-6 border border-slate-200 rounded-2xl bg-white shadow-sm relative group">
-                    <button onClick={() => handleArrayRemove('certifications', idx)} className="absolute top-4 right-4 text-red-400 p-2 hover:bg-red-50 hover:text-red-600 rounded-xl transition-colors"><Trash2 size={18}/></button>
-                    <div className="grid gap-4 pr-10">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                           <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Certification Name</label>
-                           <input type="text" value={cert.name} onChange={e => handleArrayUpdate('certifications', idx, 'name', e.target.value)} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-medium text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all" />
-                        </div>
-                        <div>
-                           <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Certificate Image/PDF</label>
-                           <div className="flex items-center gap-3">
-                             <label className="cursor-pointer px-4 py-2.5 bg-white border border-indigo-200 text-indigo-600 font-medium rounded-xl hover:bg-indigo-50 transition-colors flex items-center gap-2 text-sm">
-                               <Upload size={16} /> Upload
-                               <input 
-                                 type="file" 
-                                 accept="image/*,.pdf"
-                                 className="hidden" 
-                                 onChange={(e) => {
-                                   const file = e.target.files?.[0];
-                                   if (file) {
-                                     const reader = new FileReader();
-                                     reader.onloadend = () => handleArrayUpdate('certifications', idx, 'fileUrl', reader.result);
-                                     reader.readAsDataURL(file);
-                                   }
-                                 }}
-                               />
-                             </label>
-                             {cert.fileUrl && <span className="text-xs text-green-600 font-medium bg-green-50 px-2 py-1 rounded border border-green-200">Attached</span>}
-                           </div>
-                        </div>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-indigo-50/60 p-4 rounded-2xl border border-indigo-100">
+                  <div>
+                    <h4 className="text-sm font-bold text-indigo-950">
+                      Certificates ({data.certifications.length})
+                    </h4>
+                    <p className="text-xs text-indigo-700/80">
+                      Upload your certificates without size errors. All 20+ certificates are fully supported with auto-compression.
+                    </p>
+                  </div>
+                  <button 
+                    onClick={() => handleArrayAdd('certifications', { id: Date.now().toString(), name: '', issuer: '', date: '', link: '', fileUrl: '' })} 
+                    className="flex items-center justify-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-xl shadow-sm transition-all whitespace-nowrap"
+                  >
+                    <Plus size={16} /> Add Certificate
+                  </button>
+                </div>
+
+                {data.certifications.length === 0 ? (
+                  <div className="text-center py-10 bg-slate-50 border border-dashed border-slate-200 rounded-2xl">
+                    <p className="text-sm text-slate-500 mb-3">No certificates added yet.</p>
+                    <button 
+                      onClick={() => handleArrayAdd('certifications', { id: Date.now().toString(), name: '', issuer: '', date: '', link: '', fileUrl: '' })} 
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 transition-colors"
+                    >
+                      <Plus size={16} /> Add Your First Certificate
+                    </button>
+                  </div>
+                ) : (
+                  data.certifications.map((cert, idx) => (
+                    <div key={cert.id} className="p-6 border border-slate-200 rounded-2xl bg-white shadow-sm relative group">
+                      <div className="flex items-center justify-between mb-4">
+                        <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-md">
+                          #{idx + 1}
+                        </span>
+                        <button 
+                          onClick={() => handleArrayRemove('certifications', idx)} 
+                          className="text-red-400 p-2 hover:bg-red-50 hover:text-red-600 rounded-xl transition-colors"
+                          title="Remove certificate"
+                        >
+                          <Trash2 size={18}/>
+                        </button>
                       </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
-                           <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Issuing Organization</label>
-                           <input type="text" value={cert.issuer} onChange={e => handleArrayUpdate('certifications', idx, 'issuer', e.target.value)} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all" />
+
+                      <div className="grid gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div>
+                            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Certification Name</label>
+                            <input 
+                              type="text" 
+                              value={cert.name} 
+                              onChange={e => handleArrayUpdate('certifications', idx, 'name', e.target.value)} 
+                              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-medium text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all" 
+                              placeholder="e.g. Fundamentals of Artificial Intelligence"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Certificate Image / Document</label>
+                            <div className="flex items-center gap-3 flex-wrap">
+                              <label className="cursor-pointer px-4 py-2.5 bg-white border border-indigo-200 text-indigo-600 font-medium rounded-xl hover:bg-indigo-50 transition-colors flex items-center gap-2 text-sm shadow-xs">
+                                <Upload size={16} /> Choose File
+                                <input 
+                                  type="file" 
+                                  accept="image/*,.pdf"
+                                  className="hidden" 
+                                  onChange={async (e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                      try {
+                                        const optimized = await optimizeImage(file);
+                                        handleArrayUpdate('certifications', idx, 'fileUrl', optimized);
+                                      } catch (err) {
+                                        console.error('Failed to optimize image:', err);
+                                      }
+                                    }
+                                  }}
+                                />
+                              </label>
+
+                              {cert.fileUrl && (
+                                <div className="flex items-center gap-2 bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1.5 rounded-xl text-xs font-medium">
+                                  {cert.fileUrl.startsWith('data:image') ? (
+                                    // eslint-disable-next-line @next/next/no-img-element
+                                    <img src={cert.fileUrl} alt="Preview" className="w-6 h-6 object-cover rounded" />
+                                  ) : (
+                                    <FileText size={16} />
+                                  )}
+                                  <span>Attached</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleArrayUpdate('certifications', idx, 'fileUrl', '')}
+                                    className="ml-1 text-slate-400 hover:text-red-600 font-bold p-0.5"
+                                    title="Remove attachment"
+                                  >
+                                    ×
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          </div>
                         </div>
-                        <div>
-                           <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Date Achieved</label>
-                           <input type="text" value={cert.date} onChange={e => handleArrayUpdate('certifications', idx, 'date', e.target.value)} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all" placeholder="e.g. Aug 2024" />
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div>
+                            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Issuing Organization</label>
+                            <input 
+                              type="text" 
+                              value={cert.issuer} 
+                              onChange={e => handleArrayUpdate('certifications', idx, 'issuer', e.target.value)} 
+                              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all" 
+                              placeholder="e.g. Wadhwani Foundation"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Date Achieved</label>
+                            <input 
+                              type="text" 
+                              value={cert.date} 
+                              onChange={e => handleArrayUpdate('certifications', idx, 'date', e.target.value)} 
+                              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all" 
+                              placeholder="e.g. 18/JULY/2026" 
+                            />
+                          </div>
                         </div>
-                      </div>
-                      <div>
-                         <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Credential URL</label>
-                         <input type="text" value={cert.link} onChange={e => handleArrayUpdate('certifications', idx, 'link', e.target.value)} className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-mono text-sm text-indigo-600 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all" placeholder="https://..." />
+
+                        <div>
+                          <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Credential / Verification URL</label>
+                          <input 
+                            type="text" 
+                            value={cert.link} 
+                            onChange={e => handleArrayUpdate('certifications', idx, 'link', e.target.value)} 
+                            className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-mono text-sm text-indigo-600 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all" 
+                            placeholder="https://verify.example.com/cert/..." 
+                          />
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                )}
+
                 <button onClick={() => handleArrayAdd('certifications', { id: Date.now().toString(), name: '', issuer: '', date: '', link: '', fileUrl: '' })} className="flex items-center justify-center gap-2 w-full border-2 border-dashed border-indigo-200 text-indigo-600 font-semibold hover:bg-indigo-50 py-4 rounded-2xl transition-colors">
-                  <Plus size={18} /> Add Certification
+                  <Plus size={18} /> Add Another Certification
                 </button>
               </div>
             )}

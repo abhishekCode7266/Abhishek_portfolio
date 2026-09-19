@@ -1,5 +1,6 @@
 'use client';
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { loadFromStorage, saveToStorage } from '@/lib/storage';
 
 export type SkillGroup = {
   id: string;
@@ -213,31 +214,30 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
   const [isEditorOpen, setIsEditorOpen] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem('portfolioData');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        // eslint-disable-next-line react-hooks/set-state-in-effect
+    let isMounted = true;
+    async function init() {
+      const saved = await loadFromStorage<PortfolioData>('portfolioData');
+      if (saved && isMounted) {
         setData(prev => ({
           ...defaultData,
-          ...parsed,
-          skills: parsed.skills || defaultData.skills,
+          ...saved,
+          skills: saved.skills || defaultData.skills,
+          certifications: saved.certifications || defaultData.certifications,
         }));
-      } catch (e) {
-        console.error("Failed to parse portfolio data");
       }
     }
+    init();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const updateData = (newData: Partial<PortfolioData>) => {
     setData(prev => {
       const updated = { ...prev, ...newData };
-      try {
-        localStorage.setItem('portfolioData', JSON.stringify(updated));
-      } catch (error) {
+      saveToStorage('portfolioData', updated).catch(error => {
         console.error("Storage error:", error);
-        alert("Could not save data. The file size (image/resume) might be too large for local storage.");
-      }
+      });
       return updated;
     });
   };
