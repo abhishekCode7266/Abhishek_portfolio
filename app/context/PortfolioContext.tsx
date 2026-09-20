@@ -2,6 +2,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { loadFromStorage, saveToStorage } from '@/lib/storage';
 import { DEFAULT_PROFILE_IMAGE, DEFAULT_CERTIFICATE_IMAGE } from '@/lib/defaultAssets';
+import { getBundledGitHubProjects, fetchGitHubProjects } from '@/lib/githubSync';
 
 export type SkillGroup = {
   id: string;
@@ -17,7 +18,11 @@ export type Project = {
   github: string;
   demoUrl?: string;
   imageUrl?: string;
-  featured: boolean;
+  featured?: boolean;
+  stars?: number;
+  forks?: number;
+  language?: string;
+  category?: 'ai' | 'web' | 'java' | 'python' | 'all';
 };
 
 export type Experience = {
@@ -47,6 +52,10 @@ export type Certification = {
   date: string;
   link: string;
   fileUrl?: string;
+  startDate?: string;
+  credentialId?: string;
+  recipientName?: string;
+  skills?: string[];
 };
 
 export type PortfolioData = {
@@ -63,13 +72,13 @@ export type PortfolioData = {
     github: string;
     linkedin: string;
     email: string;
-    whatsapp?: string;
+    whatsapp: string;
     facebook?: string;
-    instagram?: string;
-    telegram?: string;
-    twitter?: string;
-    youtube?: string;
-    discord?: string;
+    instagram: string;
+    telegram: string;
+    twitter: string;
+    youtube: string;
+    discord: string;
   };
 };
 
@@ -99,82 +108,7 @@ const defaultData: PortfolioData = {
       isSeeking: true
     }
   ],
-  projects: [
-    {
-      id: "f1",
-      title: "Hospital Management System",
-      description: "A comprehensive Java-based OOP desktop application designed for managing patient records, doctor schedules, and hospital administrative tasks efficiently.",
-      tags: ["Java", "OOP", "Data Structures", "Desktop App"],
-      github: "https://github.com/abhishekCode7266/java-developer-projects",
-      demoUrl: "",
-      imageUrl: "",
-      featured: true
-    },
-    {
-      id: "o1",
-      title: "Hotel Booking System",
-      description: "An intuitive booking application managing room reservations, customer data, and billing operations.",
-      tags: ["Java", "OOP", "Management System"],
-      github: "https://github.com/abhishekCode7266/java-developer-projects",
-      featured: false
-    },
-    {
-      id: "o2",
-      title: "Student ERP System",
-      description: "A robust ERP solution handling student registrations, grades, and administrative data workflows.",
-      tags: ["Java", "Software Development", "Collections"],
-      github: "https://github.com/abhishekCode7266/java-developer-projects",
-      featured: false
-    },
-    {
-      id: "o3",
-      title: "Grocery Application",
-      description: "A digital inventory and sales management tool handling grocery items, stock, and basic transactions.",
-      tags: ["Python", "Data Handling", "CLI Tools"],
-      github: "https://github.com/abhishekCode7266/python--Developer_projects-task",
-      featured: false
-    },
-    {
-      id: "o4",
-      title: "T20 Cricket Data Project",
-      description: "An analytical project parsing and visualizing T20 cricket statistics to uncover player performance trends.",
-      tags: ["Python", "Data Analytics", "Pandas", "Matplotlib"],
-      github: "https://github.com/abhishekCode7266/Data-Science_Task_project",
-      featured: false
-    },
-    {
-      id: "o5",
-      title: "Basic Chatbot",
-      description: "A logic-based conversational bot capable of answering simple predefined queries and tasks.",
-      tags: ["Python", "Logic Programming", "Automation"],
-      github: "https://github.com/abhishekCode7266/python--Developer_projects-task",
-      featured: false
-    },
-    {
-      id: "o6",
-      title: "Frontend Development Project",
-      description: "A responsive and interactive web interface showcasing modern UI/UX design principles.",
-      tags: ["HTML5", "CSS3", "JavaScript"],
-      github: "https://github.com/abhishekCode7266/frontend-_mini_project-",
-      featured: false
-    },
-    {
-      id: "o7",
-      title: "FoodWise – Surplus Food Rescue",
-      description: "Real-time food rescue platform connecting surplus food directly with shelters and community volunteers.",
-      tags: ["Full Stack", "Web Development", "Social Impact"],
-      github: "https://github.com/abhishekCode7266/FoodWise",
-      featured: false
-    },
-    {
-      id: "o8",
-      title: "CarrerSphere-Ai",
-      description: "All-in-one AI career platform for interview preparation, skill development, and career roadmaps.",
-      tags: ["AI", "React", "Next.js", "Python"],
-      github: "https://github.com/abhishekCode7266/CarrerSphere-Ai",
-      featured: false
-    }
-  ],
+  projects: getBundledGitHubProjects(),
   certifications: [
     {
       id: "cert-wadhwani-ai",
@@ -234,6 +168,9 @@ interface PortfolioContextType {
   exportDataJSON: () => string;
   importDataJSON: (jsonString: string) => boolean;
   resetData: () => void;
+  syncWithGitHub: (overrideUsername?: string) => Promise<number>;
+  isSyncingGitHub: boolean;
+  lastGitHubSync: Date | null;
 }
 
 const PortfolioContext = createContext<PortfolioContextType | undefined>(undefined);
@@ -241,6 +178,60 @@ const PortfolioContext = createContext<PortfolioContextType | undefined>(undefin
 export function PortfolioProvider({ children }: { children: ReactNode }) {
   const [data, setData] = useState<PortfolioData>(defaultData);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
+  const [isSyncingGitHub, setIsSyncingGitHub] = useState(false);
+  const [lastGitHubSync, setLastGitHubSync] = useState<Date | null>(null);
+
+  const syncWithGitHub = async (overrideUsername?: string): Promise<number> => {
+    setIsSyncingGitHub(true);
+    try {
+      let username = overrideUsername || 'abhishekCode7266';
+      if (!overrideUsername && data.socialLinks.github) {
+        const match = data.socialLinks.github.match(/github\.com\/([^/]+)/i);
+        if (match && match[1]) {
+          username = match[1];
+        }
+      }
+
+      const fetched = await fetchGitHubProjects(username);
+      if (fetched && fetched.length > 0) {
+        setData(prev => {
+          // Merge preserving any custom images or featured preferences
+          const merged = fetched.map(item => {
+            const existing = prev.projects.find(
+              p => p.github.toLowerCase() === item.github.toLowerCase() ||
+                   p.title.toLowerCase() === item.title.toLowerCase()
+            );
+            return {
+              ...item,
+              imageUrl: existing?.imageUrl || item.imageUrl || '',
+              featured: existing?.featured !== undefined ? existing.featured : item.featured,
+            };
+          });
+
+          const updated = { ...prev, projects: merged };
+          saveToStorage('portfolioData', updated).catch(() => {});
+          
+          // Sync to AI Studio project workspace
+          if (typeof window !== 'undefined') {
+            fetch('/api/portfolio/save-data', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(updated),
+            }).catch(() => {});
+          }
+
+          return updated;
+        });
+        setLastGitHubSync(new Date());
+        return fetched.length;
+      }
+    } catch (err) {
+      console.error('GitHub sync failed:', err);
+    } finally {
+      setIsSyncingGitHub(false);
+    }
+    return 0;
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -301,6 +292,12 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
           return cert;
         });
 
+        const initialProjects = (saved?.projects && saved.projects.length >= 12)
+          ? saved.projects
+          : (remoteData?.projects && remoteData.projects.length >= 12)
+            ? remoteData.projects
+            : defaultData.projects;
+
         if (saved) {
           setData({
             ...defaultData,
@@ -309,7 +306,7 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
             profileImage: resolvedProfileImage,
             certifications: resolvedCerts,
             skills: (saved.skills && saved.skills.length > 0) ? saved.skills : (remoteData?.skills || defaultData.skills),
-            projects: (saved.projects && saved.projects.length > 0) ? saved.projects : (remoteData?.projects || defaultData.projects),
+            projects: initialProjects,
           });
         } else if (remoteData) {
           setData({
@@ -318,21 +315,51 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
             profileImage: resolvedProfileImage,
             certifications: resolvedCerts,
             skills: remoteData.skills || defaultData.skills,
-            projects: remoteData.projects || defaultData.projects,
+            projects: initialProjects,
           });
         } else {
           setData({
             ...defaultData,
             profileImage: resolvedProfileImage,
             certifications: resolvedCerts,
+            projects: initialProjects,
           });
         }
+
+        // Automatic background sync with GitHub to ensure new repositories appear automatically
+        setTimeout(() => {
+          if (isMounted) {
+            syncWithGitHub().catch(() => {});
+          }
+        }, 1500);
       }
     }
     init();
     return () => {
       isMounted = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Listen for tab focus and run periodic background check so repo additions or deletions on GitHub reflect live
+  useEffect(() => {
+    const handleFocus = () => {
+      syncWithGitHub().catch(() => {});
+    };
+    window.addEventListener('focus', handleFocus);
+
+    // Periodic check every 90 seconds
+    const interval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        syncWithGitHub().catch(() => {});
+      }
+    }, 90000);
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      clearInterval(interval);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const updateData = (newData: Partial<PortfolioData>) => {
@@ -341,6 +368,16 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
       saveToStorage('portfolioData', updated).catch(error => {
         console.error("Storage error:", error);
       });
+
+      // Synchronize directly into public/portfolio-data.json in AI Studio workspace
+      if (typeof window !== 'undefined') {
+        fetch('/api/portfolio/save-data', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updated),
+        }).catch(() => {});
+      }
+
       return updated;
     });
   };
@@ -363,6 +400,15 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
         };
         setData(sanitized);
         saveToStorage('portfolioData', sanitized);
+
+        if (typeof window !== 'undefined') {
+          fetch('/api/portfolio/save-data', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(sanitized),
+          }).catch(() => {});
+        }
+
         return true;
       }
     } catch (err) {
@@ -374,10 +420,28 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
   const resetData = () => {
     setData(defaultData);
     saveToStorage('portfolioData', defaultData);
+    if (typeof window !== 'undefined') {
+      fetch('/api/portfolio/save-data', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(defaultData),
+      }).catch(() => {});
+    }
   };
 
   return (
-    <PortfolioContext.Provider value={{ data, updateData, isEditorOpen, setIsEditorOpen, exportDataJSON, importDataJSON, resetData }}>
+    <PortfolioContext.Provider value={{ 
+      data, 
+      updateData, 
+      isEditorOpen, 
+      setIsEditorOpen, 
+      exportDataJSON, 
+      importDataJSON, 
+      resetData,
+      syncWithGitHub,
+      isSyncingGitHub,
+      lastGitHubSync,
+    }}>
       {children}
     </PortfolioContext.Provider>
   );

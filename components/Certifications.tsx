@@ -2,15 +2,17 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { SectionHeading } from './SectionHeading';
-import { Award, ExternalLink, FileText, Search, X, Maximize2, Download, CheckCircle2 } from 'lucide-react';
+import { Award, ExternalLink, FileText, Search, X, Maximize2, Download, CheckCircle2, Sparkles, Plus } from 'lucide-react';
 import { usePortfolio, Certification } from '@/app/context/PortfolioContext';
 import { formatUrl } from '@/lib/utils';
+import { CertificateUploadModal } from './CertificateUploadModal';
 
 export function Certifications() {
   const { data, setIsEditorOpen } = usePortfolio();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedIssuer, setSelectedIssuer] = useState<string>('All');
   const [previewCert, setPreviewCert] = useState<Certification | null>(null);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
 
   // Extract unique issuers for filtering
   const issuers = useMemo(() => {
@@ -44,14 +46,22 @@ export function Certifications() {
               Verified professional credentials, licenses, and course completions.
             </p>
           </div>
-          {data.certifications.length > 0 && (
-            <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white border border-indigo-100 text-indigo-700 text-xs font-bold rounded-full shadow-xs">
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              onClick={() => setIsUploadModalOpen(true)}
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-semibold rounded-xl shadow-xs hover:shadow-md transition-all cursor-pointer"
+            >
+              <Sparkles size={15} />
+              <span>Upload Certificate (Auto-Fill)</span>
+            </button>
+
+            {data.certifications.length > 0 && (
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white border border-indigo-100 text-indigo-700 text-xs font-bold rounded-xl shadow-2xs">
                 <CheckCircle2 size={14} className="text-indigo-600" />
-                {data.certifications.length} {data.certifications.length === 1 ? 'Certificate' : 'Certificates'} Available
+                {data.certifications.length} {data.certifications.length === 1 ? 'Certificate' : 'Certificates'}
               </span>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
         {/* Search & Filter Bar (shown if there are multiple certifications) */}
@@ -284,6 +294,12 @@ export function Certifications() {
           </div>
         )}
       </AnimatePresence>
+
+      {/* Certificate AI Upload & Auto-Extraction Modal */}
+      <CertificateUploadModal
+        isOpen={isUploadModalOpen}
+        onClose={() => setIsUploadModalOpen(false)}
+      />
     </section>
   );
 }
