@@ -5,19 +5,21 @@ import { Github, Linkedin, Mail, Upload, Download, ArrowDown, Facebook, Instagra
 import { usePortfolio } from '@/app/context/PortfolioContext';
 import Image from 'next/image';
 import { formatUrl } from '@/lib/utils';
+import { optimizeImage } from '@/lib/imageOptimizer';
 
 export function Hero() {
-  const { data, updateData } = usePortfolio();
+  const { data, updateData, setIsEditorOpen } = usePortfolio();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        updateData({ profileImage: reader.result as string });
-      };
-      reader.readAsDataURL(file);
+      try {
+        const optimized = await optimizeImage(file, 800, 0.88);
+        updateData({ profileImage: optimized });
+      } catch (err) {
+        console.error('Failed to optimize profile photo:', err);
+      }
     }
   };
 
@@ -73,12 +75,12 @@ export function Hero() {
               onClick={(e) => {
                 if (!data.resumeUrl) {
                   e.preventDefault();
-                  alert("Please upload your resume via the Edit Portfolio button in the bottom right corner.");
+                  setIsEditorOpen(true);
                 }
               }}
             >
               <Download size={18} />
-              Download Resume
+              {data.resumeUrl ? "Download Resume" : "Upload Resume"}
             </a>
           </div>
 

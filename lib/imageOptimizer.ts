@@ -2,7 +2,7 @@
  * Compresses and resizes images to keep storage footprint minimal while preserving high clarity.
  * Certificates will remain crisp and legible while dropping from ~5MB to ~80-150KB.
  */
-export function optimizeImage(file: File, maxWidth = 1400, quality = 0.84): Promise<string> {
+export function optimizeImage(file: File, maxWidth = 1920, quality = 0.90): Promise<string> {
   return new Promise((resolve, reject) => {
     // If it's a PDF, keep as standard data URL
     if (file.type === 'application/pdf') {

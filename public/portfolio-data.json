@@ -1,0 +1,136 @@
+{
+  "profileImage": null,
+  "resumeUrl": null,
+  "resumeName": "Abhishek_Singh_Yadav_Resume.pdf",
+  "aboutBio": "I am a 7th-semester B.Tech Computer Science student at the LDC Institute of Technical Studies, affiliated with Dr. A.P.J. Abdul Kalam Technical University (AKTU).\n\nWith a strong foundation in computer science principles, I have a deep interest in software development, frontend development, and real-world problem solving. My technical toolkit primarily revolves around Python, Java, and JavaScript.\n\nI love turning complex problems into elegant, functional, and user-friendly software solutions. Currently, I am actively seeking internship opportunities to apply my knowledge in a professional environment and continue growing as a developer.",
+  "education": [
+    {
+      "id": "1",
+      "degree": "B.Tech – Computer Science",
+      "institution": "LDC Institute of Technical Studies (Affiliated with AKTU)",
+      "startDate": "2024",
+      "endDate": "2027",
+      "percentage": "75%",
+      "location": "Uttar Pradesh, India"
+    }
+  ],
+  "experience": [
+    {
+      "id": "1",
+      "title": "Software Developer Intern (Awaiting Placement)",
+      "company": "Open to Internship Opportunities",
+      "duration": "2024 - Present",
+      "description": "Actively seeking internship and trainee opportunities in software engineering, frontend development, and Python/Java application development. Passionate about contributing to impactful real-world software products.",
+      "isSeeking": true
+    }
+  ],
+  "projects": [
+    {
+      "id": "f1",
+      "title": "Hospital Management System",
+      "description": "A comprehensive Java-based OOP desktop application designed for managing patient records, doctor schedules, and hospital administrative tasks efficiently.",
+      "tags": ["Java", "OOP", "Data Structures", "Desktop App"],
+      "github": "https://github.com",
+      "demoUrl": "",
+      "imageUrl": "",
+      "featured": true
+    },
+    {
+      "id": "o1",
+      "title": "Hotel Booking System",
+      "description": "An intuitive booking application managing room reservations, customer data, and billing operations.",
+      "tags": ["Java", "OOP"],
+      "github": "https://github.com",
+      "featured": false
+    },
+    {
+      "id": "o2",
+      "title": "Student ERP System",
+      "description": "A robust ERP solution handling student registrations, grades, and administrative data workflows.",
+      "tags": ["Java", "Software Development"],
+      "github": "https://github.com",
+      "featured": false
+    },
+    {
+      "id": "o3",
+      "title": "Grocery Application",
+      "description": "A digital inventory and sales management tool handling grocery items, stock, and basic transactions.",
+      "tags": ["Python", "Data Handling"],
+      "github": "https://github.com",
+      "featured": false
+    },
+    {
+      "id": "o4",
+      "title": "T20 Cricket Data Project",
+      "description": "An analytical project parsing and visualizing T20 cricket statistics to uncover player performance trends.",
+      "tags": ["Python", "Data Analytics", "Pandas"],
+      "github": "https://github.com",
+      "featured": false
+    },
+    {
+      "id": "o5",
+      "title": "Basic Chatbot",
+      "description": "A logic-based conversational bot capable of answering simple predefined queries and tasks.",
+      "tags": ["Python", "Logic Programming"],
+      "github": "https://github.com",
+      "featured": false
+    },
+    {
+      "id": "o6",
+      "title": "Frontend Development Project",
+      "description": "A responsive and interactive web interface showcasing modern UI/UX design principles.",
+      "tags": ["HTML5", "CSS3", "JavaScript"],
+      "github": "https://github.com",
+      "featured": false
+    }
+  ],
+  "certifications": [
+    {
+      "id": "cert-wadhwani-ai",
+      "name": "Fundamentals of Artificial Intelligence",
+      "issuer": "Wadhwani Foundation",
+      "date": "18/JULY/2026",
+      "link": "https://www.wadhwanifoundation.org",
+      "fileUrl": ""
+    }
+  ],
+  "skills": [
+    {
+      "id": "s1",
+      "category": "Frontend Development",
+      "tags": ["HTML5", "CSS3", "JavaScript", "Responsive Web Design", "DOM Manipulation", "Git & GitHub"]
+    },
+    {
+      "id": "s2",
+      "category": "Data Analytics",
+      "tags": ["Python", "Pandas", "NumPy", "Matplotlib", "Data Cleaning", "Data Analysis", "Data Visualization", "EDA", "Jupyter Notebook"]
+    },
+    {
+      "id": "s3",
+      "category": "AI / ML",
+      "tags": ["Python", "NumPy", "Pandas", "Matplotlib", "ML Fundamentals", "Data Preprocessing", "EDA", "Basic Model Evaluation"]
+    },
+    {
+      "id": "s4",
+      "category": "Software Development",
+      "tags": ["Python", "Java", "JavaScript", "OOP", "Problem Solving"]
+    },
+    {
+      "id": "s5",
+      "category": "Tools & Environment",
+      "tags": ["VS Code", "Git", "GitHub", "Jupyter Notebook"]
+    }
+  ],
+  "socialLinks": {
+    "github": "https://github.com",
+    "linkedin": "https://linkedin.com",
+    "email": "abhisheksoraon9@gmail.com",
+    "whatsapp": "",
+    "facebook": "",
+    "instagram": "",
+    "telegram": "",
+    "twitter": "",
+    "youtube": "",
+    "discord": ""
+  }
+}

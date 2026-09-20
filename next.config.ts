@@ -1,6 +1,10 @@
 import type {NextConfig} from 'next';
 
+const isGithubActions = process.env.GITHUB_ACTIONS === 'true' || process.env.EXPORT_STATIC === 'true';
+
 const nextConfig: NextConfig = {
+  output: isGithubActions ? 'export' : undefined,
+  basePath: process.env.NEXT_PUBLIC_BASE_PATH || '',
   reactStrictMode: true,
   eslint: {
     ignoreDuringBuilds: true,
@@ -38,3 +42,4 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+

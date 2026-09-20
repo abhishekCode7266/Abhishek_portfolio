@@ -158,7 +158,16 @@ const defaultData: PortfolioData = {
       featured: false
     }
   ],
-  certifications: [],
+  certifications: [
+    {
+      id: "cert-wadhwani-ai",
+      name: "Fundamentals of Artificial Intelligence",
+      issuer: "Wadhwani Foundation",
+      date: "18/JULY/2026",
+      link: "https://www.wadhwanifoundation.org",
+      fileUrl: ""
+    }
+  ],
   skills: [
     {
       id: "s1",
@@ -205,6 +214,9 @@ interface PortfolioContextType {
   updateData: (newData: Partial<PortfolioData>) => void;
   isEditorOpen: boolean;
   setIsEditorOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  exportDataJSON: () => string;
+  importDataJSON: (jsonString: string) => boolean;
+  resetData: () => void;
 }
 
 const PortfolioContext = createContext<PortfolioContextType | undefined>(undefined);
@@ -216,14 +228,38 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let isMounted = true;
     async function init() {
+      // 1. Fetch bundled/deployed portfolio-data.json so mobile & other devices always show the latest uploaded portfolio
+      let remoteData: Partial<PortfolioData> | null = null;
+      try {
+        const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
+        const res = await fetch(`${basePath}/portfolio-data.json`, { cache: 'no-store' });
+        if (res.ok) {
+          remoteData = await res.json();
+        }
+      } catch {
+        // Fallback gracefully if offline or in preview
+      }
+
+      // 2. Load device-specific live edits from IndexedDB/localStorage
       const saved = await loadFromStorage<PortfolioData>('portfolioData');
-      if (saved && isMounted) {
-        setData(prev => ({
-          ...defaultData,
-          ...saved,
-          skills: saved.skills || defaultData.skills,
-          certifications: saved.certifications || defaultData.certifications,
-        }));
+
+      if (isMounted) {
+        if (saved) {
+          setData(prev => ({
+            ...defaultData,
+            ...(remoteData || {}),
+            ...saved,
+            skills: (saved.skills && saved.skills.length > 0) ? saved.skills : (remoteData?.skills || defaultData.skills),
+            certifications: (saved.certifications && saved.certifications.length > 0) ? saved.certifications : (remoteData?.certifications || defaultData.certifications),
+          }));
+        } else if (remoteData) {
+          setData(prev => ({
+            ...defaultData,
+            ...remoteData,
+            skills: remoteData.skills || defaultData.skills,
+            certifications: remoteData.certifications || defaultData.certifications,
+          }));
+        }
       }
     }
     init();
@@ -242,8 +278,39 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
     });
   };
 
+  const exportDataJSON = () => {
+    return JSON.stringify(data, null, 2);
+  };
+
+  const importDataJSON = (jsonString: string): boolean => {
+    try {
+      const parsed = JSON.parse(jsonString);
+      if (typeof parsed === 'object' && parsed !== null) {
+        const sanitized: PortfolioData = {
+          ...defaultData,
+          ...parsed,
+          skills: Array.isArray(parsed.skills) && parsed.skills.length > 0 ? parsed.skills : defaultData.skills,
+          certifications: Array.isArray(parsed.certifications) ? parsed.certifications : defaultData.certifications,
+          projects: Array.isArray(parsed.projects) ? parsed.projects : defaultData.projects,
+          education: Array.isArray(parsed.education) ? parsed.education : defaultData.education,
+        };
+        setData(sanitized);
+        saveToStorage('portfolioData', sanitized);
+        return true;
+      }
+    } catch (err) {
+      console.error("Invalid JSON import:", err);
+    }
+    return false;
+  };
+
+  const resetData = () => {
+    setData(defaultData);
+    saveToStorage('portfolioData', defaultData);
+  };
+
   return (
-    <PortfolioContext.Provider value={{ data, updateData, isEditorOpen, setIsEditorOpen }}>
+    <PortfolioContext.Provider value={{ data, updateData, isEditorOpen, setIsEditorOpen, exportDataJSON, importDataJSON, resetData }}>
       {children}
     </PortfolioContext.Provider>
   );

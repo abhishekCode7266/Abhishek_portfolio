@@ -1,15 +1,19 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { usePortfolio } from '@/app/context/PortfolioContext';
-import { Settings, X, Plus, Trash2, Upload, FileText, Image as ImageIcon } from 'lucide-react';
+import { Settings, X, Plus, Trash2, Upload, FileText, Image as ImageIcon, Download, Copy, Check, RefreshCw, Smartphone, Globe, CheckCircle2, AlertCircle } from 'lucide-react';
 import { optimizeImage } from '@/lib/imageOptimizer';
 
-const TABS = ['General', 'About', 'Skills', 'Education', 'Experience & Internships', 'Projects', 'Certifications'];
+const TABS = ['General', 'About', 'Skills', 'Education', 'Experience & Internships', 'Projects', 'Certifications', 'Deploy & Sync'];
 
 export function PortfolioEditor() {
-  const { data, updateData, isEditorOpen, setIsEditorOpen } = usePortfolio();
+  const { data, updateData, isEditorOpen, setIsEditorOpen, exportDataJSON, importDataJSON, resetData } = usePortfolio();
   const [activeTab, setActiveTab] = useState('General');
+  const [copied, setCopied] = useState(false);
+  const [importStatus, setImportStatus] = useState<string | null>(null);
+  const [importText, setImportText] = useState('');
+  const importFileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -23,6 +27,61 @@ export function PortfolioEditor() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [setIsEditorOpen]);
+
+  const handleDownloadJSON = () => {
+    const jsonStr = exportDataJSON();
+    const blob = new Blob([jsonStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'portfolio-data.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleCopyJSON = () => {
+    const jsonStr = exportDataJSON();
+    navigator.clipboard.writeText(jsonStr).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    }).catch(err => {
+      console.error('Clipboard error:', err);
+    });
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const content = event.target?.result as string;
+        if (content) {
+          const success = importDataJSON(content);
+          if (success) {
+            setImportStatus('Successfully imported portfolio data!');
+            setTimeout(() => setImportStatus(null), 4000);
+          } else {
+            setImportStatus('Failed to parse JSON file. Please check format.');
+          }
+        }
+      };
+      reader.readAsText(file);
+    }
+  };
+
+  const handleTextImport = () => {
+    if (!importText.trim()) return;
+    const success = importDataJSON(importText.trim());
+    if (success) {
+      setImportStatus('Successfully imported portfolio data!');
+      setImportText('');
+      setTimeout(() => setImportStatus(null), 4000);
+    } else {
+      setImportStatus('Invalid JSON format. Please verify the code.');
+    }
+  };
 
   if (!isEditorOpen) {
     return (
@@ -84,7 +143,29 @@ export function PortfolioEditor() {
         <div className="flex-1 p-6 md:p-10 overflow-y-auto bg-white relative flex flex-col">
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 pb-4 border-b border-slate-100 shrink-0 gap-4">
             <h3 className="text-2xl font-bold text-slate-800">{activeTab}</h3>
-            <div className="flex items-center gap-4 flex-wrap">
+            <div className="flex items-center gap-3 flex-wrap">
+              {/* Quick Export & Sync buttons */}
+              <button
+                type="button"
+                onClick={handleDownloadJSON}
+                className="flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl transition-colors border border-slate-200 shadow-2xs"
+                title="Download updated portfolio-data.json"
+              >
+                <Download size={14} /> Download JSON
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveTab('Deploy & Sync')}
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 font-semibold text-xs rounded-xl transition-colors border shadow-2xs ${
+                  activeTab === 'Deploy & Sync' 
+                    ? 'bg-indigo-600 text-white border-indigo-600' 
+                    : 'bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border-indigo-200'
+                }`}
+              >
+                <Globe size={14} /> Deploy & Sync
+              </button>
+
               {/* Global Profile Image Upload */}
               <div className="flex items-center gap-3 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200">
                 {data.profileImage ? (
@@ -103,12 +184,15 @@ export function PortfolioEditor() {
                     type="file" 
                     accept="image/*"
                     className="hidden" 
-                    onChange={(e) => {
+                    onChange={async (e) => {
                       const file = e.target.files?.[0];
                       if (file) {
-                        const reader = new FileReader();
-                        reader.onloadend = () => updateData({ profileImage: reader.result as string });
-                        reader.readAsDataURL(file);
+                        try {
+                          const optimized = await optimizeImage(file, 800, 0.88);
+                          updateData({ profileImage: optimized });
+                        } catch (err) {
+                          console.error('Failed to optimize profile photo:', err);
+                        }
                       }
                     }}
                   />
@@ -446,6 +530,46 @@ export function PortfolioEditor() {
                         <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Description</label>
                         <textarea value={proj.description} onChange={e => handleArrayUpdate('projects', idx, 'description', e.target.value)} className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all resize-y" rows={3} />
                       </div>
+
+                      <div>
+                        <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Project Preview Image (Optional)</label>
+                        <div className="flex items-center gap-3 flex-wrap">
+                          <label className="cursor-pointer px-4 py-2 bg-white border border-indigo-200 text-indigo-600 font-medium rounded-xl hover:bg-indigo-50 transition-colors flex items-center gap-2 text-sm shadow-2xs">
+                            <Upload size={16} /> Choose Image
+                            <input 
+                              type="file" 
+                              accept="image/*" 
+                              className="hidden" 
+                              onChange={async (e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                  try {
+                                    const optimized = await optimizeImage(file, 1200, 0.88);
+                                    handleArrayUpdate('projects', idx, 'imageUrl', optimized);
+                                  } catch (err) {
+                                    console.error('Failed to optimize project image:', err);
+                                  }
+                                }
+                              }} 
+                            />
+                          </label>
+                          {proj.imageUrl && (
+                            <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl text-xs">
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img src={proj.imageUrl} alt="preview" className="w-6 h-6 object-cover rounded" />
+                              <span className="text-slate-700 font-medium">Image uploaded</span>
+                              <button 
+                                type="button" 
+                                onClick={() => handleArrayUpdate('projects', idx, 'imageUrl', '')} 
+                                className="text-red-500 hover:text-red-700 font-bold ml-1 p-0.5"
+                                title="Remove image"
+                              >
+                                ×
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
                       
                       <div className="pt-2">
                         <label className="flex items-center gap-3 p-3 border border-indigo-100 bg-indigo-50/50 rounded-xl cursor-pointer hover:bg-indigo-50 transition-colors w-max">
@@ -528,14 +652,17 @@ export function PortfolioEditor() {
                                   type="file" 
                                   accept="image/*,.pdf"
                                   className="hidden" 
-                                  onChange={async (e) => {
+                                   onChange={async (e) => {
                                     const file = e.target.files?.[0];
                                     if (file) {
                                       try {
-                                        const optimized = await optimizeImage(file);
+                                        const optimized = await optimizeImage(file, 1920, 0.90);
                                         handleArrayUpdate('certifications', idx, 'fileUrl', optimized);
+                                        if (!cert.link) {
+                                          handleArrayUpdate('certifications', idx, 'link', optimized);
+                                        }
                                       } catch (err) {
-                                        console.error('Failed to optimize image:', err);
+                                        console.error('Failed to optimize certificate image:', err);
                                       }
                                     }
                                   }}
@@ -544,7 +671,7 @@ export function PortfolioEditor() {
 
                               {cert.fileUrl && (
                                 <div className="flex items-center gap-2 bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1.5 rounded-xl text-xs font-medium">
-                                  {cert.fileUrl.startsWith('data:image') ? (
+                                  {cert.fileUrl.startsWith('data:image') || !cert.fileUrl.includes('.pdf') ? (
                                     // eslint-disable-next-line @next/next/no-img-element
                                     <img src={cert.fileUrl} alt="Preview" className="w-6 h-6 object-cover rounded" />
                                   ) : (
@@ -606,6 +733,145 @@ export function PortfolioEditor() {
                 <button onClick={() => handleArrayAdd('certifications', { id: Date.now().toString(), name: '', issuer: '', date: '', link: '', fileUrl: '' })} className="flex items-center justify-center gap-2 w-full border-2 border-dashed border-indigo-200 text-indigo-600 font-semibold hover:bg-indigo-50 py-4 rounded-2xl transition-colors">
                   <Plus size={18} /> Add Another Certification
                 </button>
+              </div>
+            )}
+
+            {activeTab === 'Deploy & Sync' && (
+              <div className="space-y-8">
+                {/* Status Notice */}
+                <div className="bg-indigo-50/70 border border-indigo-200 p-6 rounded-3xl">
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 bg-indigo-600 text-white rounded-2xl shrink-0 mt-0.5 shadow-sm">
+                      <Globe size={24} />
+                    </div>
+                    <div>
+                      <h4 className="text-base font-bold text-slate-900 mb-1">
+                        How to Make Your Uploads Permanent on Mobile & Deployments
+                      </h4>
+                      <p className="text-sm text-slate-600 leading-relaxed">
+                        When you upload certificates or photos, they are securely saved in this browser. To make sure your changes are visible on mobile phones, tablets, GitHub Pages, and any shared link, use the options below:
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {importStatus && (
+                  <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl text-sm font-semibold flex items-center gap-2">
+                    <CheckCircle2 size={18} className="text-emerald-600 shrink-0" />
+                    {importStatus}
+                  </div>
+                )}
+
+                {/* Grid with 2 primary methods */}
+                <div className="grid md:grid-cols-2 gap-6">
+                  {/* Option 1: Download JSON for Repository / Deploy */}
+                  <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center gap-2.5 text-indigo-600 font-bold text-base mb-2">
+                        <Download size={20} />
+                        <span>1. Download for GitHub / Production</span>
+                      </div>
+                      <p className="text-xs text-slate-500 leading-relaxed mb-4">
+                        Download your current portfolio data file. Place it in the <code className="bg-slate-100 px-1.5 py-0.5 rounded text-indigo-600 font-mono text-xs">public/portfolio-data.json</code> folder of your project and commit to GitHub. Then every visitor on mobile or desktop will automatically see all your uploaded certificates and changes!
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleDownloadJSON}
+                      className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-2xl shadow-sm transition-colors text-sm"
+                    >
+                      <Download size={16} />
+                      Download portfolio-data.json
+                    </button>
+                  </div>
+
+                  {/* Option 2: Copy & Sync Across Devices */}
+                  <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center gap-2.5 text-indigo-600 font-bold text-base mb-2">
+                        <Smartphone size={20} />
+                        <span>2. Copy & Sync to Mobile</span>
+                      </div>
+                      <p className="text-xs text-slate-500 leading-relaxed mb-4">
+                        Copy your portfolio data code to clipboard. Send it to your phone via WhatsApp or Email, then open your portfolio on mobile and paste it in the Import section below.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleCopyJSON}
+                      className={`w-full flex items-center justify-center gap-2 px-5 py-3 font-semibold rounded-2xl shadow-sm transition-colors text-sm border ${
+                        copied 
+                          ? 'bg-emerald-600 text-white border-emerald-600' 
+                          : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200'
+                      }`}
+                    >
+                      {copied ? (
+                        <>
+                          <Check size={16} /> Copied to Clipboard!
+                        </>
+                      ) : (
+                        <>
+                          <Copy size={16} /> Copy Portfolio JSON
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Import section */}
+                <div className="bg-slate-50 p-6 rounded-3xl border border-slate-200 space-y-4">
+                  <h4 className="text-sm font-bold text-slate-800 flex items-center gap-2">
+                    <Upload size={16} className="text-indigo-600" />
+                    Import Data from File or Code
+                  </h4>
+                  <p className="text-xs text-slate-500">
+                    Use this on your mobile device or any other browser to instantly load all your certificates and profile settings.
+                  </p>
+
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <input
+                      type="file"
+                      ref={importFileInputRef}
+                      accept=".json"
+                      onChange={handleFileUpload}
+                      className="hidden"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => importFileInputRef.current?.click()}
+                      className="flex-1 px-4 py-2.5 bg-white border border-slate-200 hover:border-indigo-300 text-slate-700 font-semibold rounded-xl text-xs flex items-center justify-center gap-2 shadow-2xs transition-colors"
+                    >
+                      <Upload size={14} /> Upload portfolio-data.json
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={resetData}
+                      className="px-4 py-2.5 bg-white border border-rose-200 hover:bg-rose-50 text-rose-600 font-semibold rounded-xl text-xs flex items-center justify-center gap-1.5 transition-colors"
+                      title="Reset to default data"
+                    >
+                      <RefreshCw size={14} /> Reset Defaults
+                    </button>
+                  </div>
+
+                  <div className="pt-2">
+                    <textarea
+                      value={importText}
+                      onChange={(e) => setImportText(e.target.value)}
+                      placeholder="Or paste your exported JSON data here..."
+                      rows={3}
+                      className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl font-mono text-xs text-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleTextImport}
+                      disabled={!importText.trim()}
+                      className="mt-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 text-white font-semibold rounded-xl text-xs transition-colors"
+                    >
+                      Apply Pasted Data
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
 

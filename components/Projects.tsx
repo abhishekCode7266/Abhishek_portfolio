@@ -59,8 +59,17 @@ export function Projects() {
                   )}
                 </div>
               </div>
-              <div className="hidden lg:block relative h-full min-h-[300px] w-full bg-[#1e1e1e] rounded-2xl border border-slate-700 overflow-hidden shadow-2xl group-hover:border-indigo-500/50 transition-colors">
-                <GithubCodeSnippet githubUrl={featuredProject.github} />
+              <div className="relative h-64 sm:h-80 lg:h-full min-h-[260px] w-full bg-[#1e1e1e] rounded-2xl border border-slate-700 overflow-hidden shadow-2xl group-hover:border-indigo-500/50 transition-colors">
+                {featuredProject.imageUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img 
+                    src={featuredProject.imageUrl} 
+                    alt={featuredProject.title} 
+                    className="w-full h-full object-cover object-top" 
+                  />
+                ) : (
+                  <GithubCodeSnippet githubUrl={featuredProject.github} />
+                )}
               </div>
             </div>
           </motion.div>
@@ -88,13 +97,18 @@ export function Projects() {
                 </div>
               </div>
 
-              {project.github && (
-                <div className="relative z-10 w-full h-32 mb-6 rounded-xl border border-slate-700 overflow-hidden bg-[#1e1e1e] shadow-inner group-hover:border-indigo-500/50 transition-colors">
-                  <div className="absolute inset-0 scale-[0.6] origin-top-left w-[166.66%] h-[166.66%]">
+              {project.imageUrl ? (
+                <div className="relative z-10 w-full h-44 mb-6 rounded-xl border border-slate-200 overflow-hidden bg-slate-100 shadow-inner group-hover:border-indigo-300 transition-colors">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={project.imageUrl} alt={project.title} className="w-full h-full object-cover object-top" />
+                </div>
+              ) : project.github ? (
+                <div className="relative z-10 w-full h-36 mb-6 rounded-xl border border-slate-700 overflow-hidden bg-[#1e1e1e] shadow-inner group-hover:border-indigo-500/50 transition-colors">
+                  <div className="absolute inset-0 scale-[0.65] origin-top-left w-[153%] h-[153%]">
                      <GithubCodeSnippet githubUrl={project.github} />
                   </div>
                 </div>
-              )}
+              ) : null}
               
               <h4 className="relative z-10 text-xl font-bold text-slate-800 mb-3 group-hover:text-indigo-600 transition-colors">{project.title}</h4>
               <p className="relative z-10 text-slate-600 leading-relaxed mb-6 flex-1">{project.description}</p>
