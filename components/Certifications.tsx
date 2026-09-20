@@ -150,7 +150,7 @@ export function Certifications() {
                 </div>
                 
                 {/* Visual Certificate Card Preview */}
-                {cert.fileUrl && cert.fileUrl.startsWith('data:image') && (
+                {cert.fileUrl && !cert.fileUrl.toLowerCase().endsWith('.pdf') && (
                   <div 
                     onClick={() => setPreviewCert(cert)}
                     className="relative w-full h-44 mb-5 rounded-2xl overflow-hidden border border-slate-200 bg-slate-50/50 shadow-inner flex items-center justify-center p-2 cursor-pointer group/img"
