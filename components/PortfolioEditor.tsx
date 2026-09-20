@@ -5,7 +5,7 @@ import { usePortfolio } from '@/app/context/PortfolioContext';
 import { Settings, X, Plus, Trash2, Upload, FileText, Image as ImageIcon, Download, Copy, Check, RefreshCw, Smartphone, Globe, CheckCircle2, AlertCircle, Sparkles, Loader2, GitCommit, GitBranch, ExternalLink, Key, ShieldCheck, Eye, EyeOff, Send } from 'lucide-react';
 import { optimizeImage } from '@/lib/imageOptimizer';
 import { extractCertificateDetails } from '@/lib/certificateExtractor';
-import { pushDataToGitHubRepo } from '@/lib/githubPusher';
+import { pushDataToGitHubRepo, pushWorkflowFixToGitHub } from '@/lib/githubPusher';
 
 const TABS = ['General', 'About', 'Skills', 'Education', 'Experience & Internships', 'Projects', 'Certifications', 'Deploy & Sync'];
 
@@ -76,6 +76,40 @@ export function PortfolioEditor() {
       });
     } finally {
       setIsPushingToGitHub(false);
+    }
+  };
+
+  const [isPushingWorkflowFix, setIsPushingWorkflowFix] = useState(false);
+
+  const handlePushWorkflowFix = async () => {
+    if (!githubToken.trim()) {
+      setPushStatus({
+        success: false,
+        message: 'Please enter your GitHub Personal Access Token first to push the workflow fix.',
+      });
+      return;
+    }
+    setIsPushingWorkflowFix(true);
+    setPushStatus(null);
+    try {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('abhishek_github_token', githubToken.trim());
+      }
+      const res = await pushWorkflowFixToGitHub(
+        githubToken.trim(),
+        githubRepoOwner.trim() || 'abhishekCode7266',
+        githubRepoName.trim() || 'Abhishek_portfolio'
+      );
+      setPushStatus({
+        success: res.success,
+        message: res.message || res.error || 'Finished',
+        url: res.commitUrl,
+      });
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Unknown error pushing workflow fix';
+      setPushStatus({ success: false, message: `Failed: ${msg}` });
+    } finally {
+      setIsPushingWorkflowFix(false);
     }
   };
 
@@ -1018,6 +1052,44 @@ export function PortfolioEditor() {
                         </p>
                       </motion.div>
                     )}
+
+                    {/* Workflow Build Fix Alert & Action */}
+                    <div className="p-4 bg-amber-50/80 border border-amber-200/80 rounded-2xl space-y-2.5">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <span className="flex h-2 w-2 rounded-full bg-emerald-500 ring-4 ring-emerald-100" />
+                          <h6 className="font-bold text-slate-900 text-xs">
+                            GitHub Actions Build Error Fix Ready
+                          </h6>
+                        </div>
+                        <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-2xs font-semibold rounded-full">
+                          Ready to Deploy
+                        </span>
+                      </div>
+                      <p className="text-2xs text-slate-600 leading-relaxed">
+                        GitHub Actions runner error (<code className="font-mono text-amber-900 bg-amber-100/70 px-1 py-0.5 rounded">cannot be used with &quot;output: export&quot;</code>) ko fix kar diya gaya hai. Apna Personal Access Token enter karke niche diye gaye button par click karein taaki GitHub Actions workflow update hokar <strong>Green ✅ Pass</strong> ho sake.
+                      </p>
+                      <div className="pt-1 flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          onClick={handlePushWorkflowFix}
+                          disabled={isPushingWorkflowFix}
+                          className="flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-300 text-white font-semibold rounded-xl text-xs shadow-xs cursor-pointer transition-colors"
+                        >
+                          {isPushingWorkflowFix ? (
+                            <>
+                              <Loader2 size={14} className="animate-spin" />
+                              <span>Updating .github/workflows/nextjs.yml...</span>
+                            </>
+                          ) : (
+                            <>
+                              <CheckCircle2 size={14} />
+                              <span>Push Workflow & Build Fix to GitHub</span>
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
 
                     <div className="flex flex-col sm:flex-row gap-3 pt-1">
                       <button

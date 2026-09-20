@@ -40,7 +40,9 @@ jobs:
         env:
           NODE_ENV: production
           NEXT_PUBLIC_BASE_PATH: ${{ steps.pages.outputs.base_path }}
-        run: npx next build
+        run: |
+          rm -rf app/api
+          npx next build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
