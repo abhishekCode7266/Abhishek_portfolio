@@ -84,7 +84,7 @@ export type PortfolioData = {
 
 const defaultData: PortfolioData = {
   profileImage: DEFAULT_PROFILE_IMAGE,
-  resumeUrl: null,
+  resumeUrl: "/Abhishek_Singh_Yadav_Resume.pdf",
   resumeName: "Abhishek_Singh_Yadav_Resume.pdf",
   aboutBio: "I am a 7th-semester B.Tech Computer Science student at the LDC Institute of Technical Studies, affiliated with Dr. A.P.J. Abdul Kalam Technical University (AKTU).\n\nWith a strong foundation in computer science principles, I have a deep interest in software development, frontend development, and real-world problem solving. My technical toolkit primarily revolves around Python, Java, and JavaScript.\n\nI love turning complex problems into elegant, functional, and user-friendly software solutions. Currently, I am actively seeking internship opportunities to apply my knowledge in a professional environment and continue growing as a developer.",
   education: [

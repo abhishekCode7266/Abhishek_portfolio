@@ -221,12 +221,6 @@ export function transformRepo(repo: RawGitHubRepo): SyncedProject {
     demoUrl = undefined;
   }
 
-  const cleanSeed = (known?.title || repo.name)
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '') || 'project';
-  const defaultPlaceholder = `https://picsum.photos/seed/${cleanSeed}/800/450`;
-
   return {
     id: `gh-${repo.id || repo.name}`,
     title,
@@ -234,7 +228,7 @@ export function transformRepo(repo: RawGitHubRepo): SyncedProject {
     tags,
     github: repo.html_url,
     demoUrl,
-    imageUrl: known?.imageUrl || defaultPlaceholder,
+    imageUrl: known?.imageUrl || '',
     featured: known?.featured || repo.stargazers_count > 0,
     stars: repo.stargazers_count || 0,
     forks: repo.forks_count || 0,

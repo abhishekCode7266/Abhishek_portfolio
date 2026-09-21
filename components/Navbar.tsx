@@ -1,8 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import { Menu, X, Sun, Moon } from 'lucide-react';
-import { useTheme } from '@/app/context/ThemeContext';
+import { motion } from 'motion/react';
+import { Menu, X } from 'lucide-react';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 const navLinks = [
   { name: 'About', href: '#about' },
@@ -18,7 +18,6 @@ export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<string>('');
-  const { toggleTheme, isDark, mounted } = useTheme();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -80,8 +79,6 @@ export function Navbar() {
     }
   };
 
-  const showDark = mounted && isDark;
-
   return (
     <header 
       className={`fixed top-0 w-full z-50 transition-all duration-300 ${
@@ -132,59 +129,12 @@ export function Navbar() {
           <div className="h-5 w-px bg-slate-200 dark:bg-slate-700/80" />
 
           {/* Dark Mode Toggle Button */}
-          <button
-            id="theme-toggle-desktop"
-            type="button"
-            onClick={toggleTheme}
-            suppressHydrationWarning
-            aria-label={showDark ? 'Switch to light theme' : 'Switch to dark theme'}
-            title={showDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-            className="relative p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-amber-400 hover:bg-slate-200 dark:hover:bg-slate-700/80 border border-slate-200 dark:border-slate-700/80 transition-colors cursor-pointer flex items-center justify-center shadow-2xs"
-          >
-            <AnimatePresence mode="wait" initial={false}>
-              {showDark ? (
-                <motion.div
-                  key="sun"
-                  initial={{ rotate: -90, opacity: 0, scale: 0.7 }}
-                  animate={{ rotate: 0, opacity: 1, scale: 1 }}
-                  exit={{ rotate: 90, opacity: 0, scale: 0.7 }}
-                  transition={{ duration: 0.2 }}
-                  className="flex items-center justify-center"
-                >
-                  <Sun size={18} className="text-amber-400 fill-amber-400/20" />
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="moon"
-                  initial={{ rotate: 90, opacity: 0, scale: 0.7 }}
-                  animate={{ rotate: 0, opacity: 1, scale: 1 }}
-                  exit={{ rotate: -90, opacity: 0, scale: 0.7 }}
-                  transition={{ duration: 0.2 }}
-                  className="flex items-center justify-center"
-                >
-                  <Moon size={18} className="text-slate-700 fill-slate-700/10" />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </button>
+          <ThemeToggle id="theme-toggle-desktop" size="md" />
         </div>
 
         {/* Mobile Actions: Theme Toggle + Menu Hamburger */}
         <div className="flex lg:hidden items-center gap-2">
-          <button
-            id="theme-toggle-mobile-header"
-            type="button"
-            onClick={toggleTheme}
-            suppressHydrationWarning
-            aria-label={showDark ? 'Switch to light theme' : 'Switch to dark theme'}
-            className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-amber-400 border border-slate-200 dark:border-slate-700/80 transition-colors cursor-pointer"
-          >
-            {showDark ? (
-              <Sun size={20} className="text-amber-400 fill-amber-400/20" />
-            ) : (
-              <Moon size={20} className="text-slate-700 fill-slate-700/10" />
-            )}
-          </button>
+          <ThemeToggle id="theme-toggle-mobile-header" size="md" />
 
           <button 
             id="mobile-menu-toggle"
@@ -233,24 +183,7 @@ export function Navbar() {
               <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                 Appearance
               </span>
-              <button
-                type="button"
-                onClick={toggleTheme}
-                suppressHydrationWarning
-                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-xs font-medium text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 cursor-pointer"
-              >
-                {showDark ? (
-                  <>
-                    <Sun size={14} className="text-amber-400" />
-                    <span>Light Mode</span>
-                  </>
-                ) : (
-                  <>
-                    <Moon size={14} className="text-slate-600" />
-                    <span>Dark Mode</span>
-                  </>
-                )}
-              </button>
+              <ThemeToggle id="theme-toggle-mobile-drawer" showLabel={true} size="sm" />
             </div>
           </nav>
         </motion.div>

@@ -124,7 +124,7 @@ export function Footer() {
               </p>
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                Available for internships &amp; developer roles
+                Open to Software Engineering Roles
               </div>
             </div>
 

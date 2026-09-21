@@ -1,5 +1,5 @@
 'use client';
-import { createContext, useContext, useEffect, useSyncExternalStore, ReactNode, useCallback } from 'react';
+import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react';
 
 type Theme = 'light' | 'dark';
 
@@ -26,53 +26,66 @@ function applyThemeClass(newTheme: Theme) {
   }
 }
 
-const emptySubscribe = () => () => {};
-
-export function useIsMounted(): boolean {
-  return useSyncExternalStore(
-    emptySubscribe,
-    () => true,
-    () => false
-  );
-}
-
-function subscribeTheme(onStoreChange: () => void) {
-  window.addEventListener('storage', onStoreChange);
-  window.addEventListener('portfolio-theme-change', onStoreChange);
-  const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-  mediaQuery.addEventListener('change', onStoreChange);
-  return () => {
-    window.removeEventListener('storage', onStoreChange);
-    window.removeEventListener('portfolio-theme-change', onStoreChange);
-    mediaQuery.removeEventListener('change', onStoreChange);
-  };
-}
-
-function getThemeSnapshot(): Theme {
+function getInitialTheme(): Theme {
+  if (typeof window === 'undefined') return 'light';
   try {
     const stored = localStorage.getItem('portfolio_theme') || localStorage.getItem('theme');
     if (stored === 'dark' || stored === 'light') {
       return stored;
     }
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      return 'dark';
+    }
+    if (document.documentElement.classList.contains('dark')) {
+      return 'dark';
+    }
   } catch {
-    return 'light';
+    // fallback
   }
-}
-
-function getServerThemeSnapshot(): Theme {
   return 'light';
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const mounted = useIsMounted();
-  const theme = useSyncExternalStore(subscribeTheme, getThemeSnapshot, getServerThemeSnapshot);
+  const [theme, setThemeState] = useState<Theme>('light');
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    applyThemeClass(theme);
-  }, [theme]);
+    setMounted(true);
+    const initialTheme = getInitialTheme();
+    setThemeState(initialTheme);
+    applyThemeClass(initialTheme);
+
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleMediaChange = (e: MediaQueryListEvent) => {
+      const stored = localStorage.getItem('portfolio_theme') || localStorage.getItem('theme');
+      if (!stored) {
+        const sysTheme: Theme = e.matches ? 'dark' : 'light';
+        setThemeState(sysTheme);
+        applyThemeClass(sysTheme);
+      }
+    };
+
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'portfolio_theme' || e.key === 'theme') {
+        const val = e.newValue as Theme;
+        if (val === 'dark' || val === 'light') {
+          setThemeState(val);
+          applyThemeClass(val);
+        }
+      }
+    };
+
+    mediaQuery.addEventListener('change', handleMediaChange);
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      mediaQuery.removeEventListener('change', handleMediaChange);
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
 
   const setTheme = useCallback((newTheme: Theme) => {
+    setThemeState(newTheme);
     try {
       localStorage.setItem('portfolio_theme', newTheme);
       localStorage.setItem('theme', newTheme);
@@ -80,14 +93,21 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       // ignore storage error
     }
     applyThemeClass(newTheme);
-    window.dispatchEvent(new Event('portfolio-theme-change'));
   }, []);
 
   const toggleTheme = useCallback(() => {
-    const current = getThemeSnapshot();
-    const nextTheme: Theme = current === 'dark' ? 'light' : 'dark';
-    setTheme(nextTheme);
-  }, [setTheme]);
+    setThemeState((prev) => {
+      const nextTheme: Theme = prev === 'dark' ? 'light' : 'dark';
+      try {
+        localStorage.setItem('portfolio_theme', nextTheme);
+        localStorage.setItem('theme', nextTheme);
+      } catch {
+        // ignore storage error
+      }
+      applyThemeClass(nextTheme);
+      return nextTheme;
+    });
+  }, []);
 
   return (
     <ThemeContext.Provider

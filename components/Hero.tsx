@@ -1,14 +1,14 @@
 'use client';
 import { useRef } from 'react';
 import { motion } from 'motion/react';
-import { Github, Linkedin, Mail, Upload, Download, ArrowDown, Facebook, Instagram, MessageCircle, Send, Twitter, Youtube } from 'lucide-react';
+import { Github, Linkedin, Mail, Upload, Download, ArrowDown, FileText, Facebook, Instagram, MessageCircle, Send, Twitter, Youtube } from 'lucide-react';
 import { usePortfolio } from '@/app/context/PortfolioContext';
 import Image from 'next/image';
 import { formatUrl } from '@/lib/utils';
 import { optimizeImage } from '@/lib/imageOptimizer';
 
 export function Hero() {
-  const { data, updateData, setIsEditorOpen } = usePortfolio();
+  const { data, updateData } = usePortfolio();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,11 +51,6 @@ export function Hero() {
           transition={{ duration: 0.8 }}
           className="flex flex-col items-center text-center lg:items-start lg:text-left gap-6 order-2 lg:order-1"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-100 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 text-sm font-semibold shadow-sm">
-            <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
-            Available for Internships
-          </div>
-          
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-white leading-[1.1] tracking-tight">
             Hi, I&apos;m <br className="hidden lg:block" />
             <span className="text-indigo-600 dark:text-indigo-400">Abhishek Singh Yadav</span>
@@ -73,30 +68,28 @@ export function Hero() {
 
           <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 mt-4">
             <a 
+              id="hero-view-projects-btn"
               href="#projects"
               onClick={scrollToProjects}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 dark:bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 dark:hover:bg-indigo-500 transition-colors shadow-lg shadow-indigo-200 dark:shadow-none cursor-pointer"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 dark:bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 dark:hover:bg-indigo-500 hover:shadow-indigo-300/40 dark:hover:shadow-indigo-900/30 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 shadow-lg shadow-indigo-200/50 dark:shadow-none cursor-pointer"
             >
               View Projects
               <ArrowDown size={18} />
             </a>
             <a 
-              href={data.resumeUrl || "#"} 
-              download={data.resumeUrl ? data.resumeName || "Resume.pdf" : undefined}
-              className={`inline-flex items-center gap-2 px-6 py-3 font-medium rounded-xl transition-colors shadow-sm border ${
-                data.resumeUrl 
-                  ? "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700" 
-                  : "bg-slate-50 dark:bg-slate-800/50 text-slate-400 dark:text-slate-500 border-slate-100 dark:border-slate-800 cursor-not-allowed"
-              }`}
-              onClick={(e) => {
-                if (!data.resumeUrl) {
-                  e.preventDefault();
-                  setIsEditorOpen(true);
-                }
-              }}
+              id="hero-download-cv-btn"
+              href={data.resumeUrl || "/Abhishek_Singh_Yadav_Resume.pdf"} 
+              download={data.resumeName || "Abhishek_Singh_Yadav_Resume.pdf"}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Download Abhishek Singh Yadav's CV in PDF format"
+              className="group relative inline-flex items-center gap-2.5 px-6 py-3 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-slate-700/80 font-medium rounded-xl transition-all duration-200 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-500/50 hover:-translate-y-0.5 active:translate-y-0 border border-slate-200/90 dark:border-slate-700 cursor-pointer overflow-hidden"
             >
-              <Download size={18} />
-              {data.resumeUrl ? "Download Resume" : "Upload Resume"}
+              {/* Subtle light shimmer on hover */}
+              <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-indigo-500/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out pointer-events-none" />
+              <FileText size={18} className="text-slate-400 dark:text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-200" />
+              <span>Download CV</span>
+              <Download size={16} className="text-indigo-600 dark:text-indigo-400 group-hover:translate-y-0.5 transition-transform duration-200" />
             </a>
           </div>
 

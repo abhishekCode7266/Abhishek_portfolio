@@ -1,77 +1,11 @@
 'use client';
 import { useState, useMemo } from 'react';
-import Image from 'next/image';
 import { motion } from 'motion/react';
 import { SectionHeading } from './SectionHeading';
-import { Github, Folder, ExternalLink, Globe, RefreshCw, CheckCircle2, Star, GitFork, Search, Sparkles, Code2 } from 'lucide-react';
+import { Github, Folder, ExternalLink, Globe, RefreshCw, CheckCircle2, Star, GitFork, Search, Sparkles } from 'lucide-react';
 import { usePortfolio, Project } from '@/app/context/PortfolioContext';
 import { formatUrl } from '@/lib/utils';
-
-export function getProjectImage(project: { title: string; imageUrl?: string; id?: string; language?: string }): string {
-  if (project.imageUrl && project.imageUrl.trim()) {
-    return project.imageUrl.trim();
-  }
-  const cleanSeed = (project.title || project.id || 'project')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '') || 'portfolio-project';
-  return `https://picsum.photos/seed/${cleanSeed}/800/480`;
-}
-
-function ProjectImageThumbnail({ 
-  src, 
-  alt, 
-  priority = false,
-  language,
-  category,
-}: { 
-  src: string; 
-  alt: string; 
-  priority?: boolean;
-  language?: string;
-  category?: string;
-}) {
-  const [imgError, setImgError] = useState(false);
-  const [loaded, setLoaded] = useState(false);
-
-  // Fallback visual placeholder when image fails to load or offline
-  if (imgError) {
-    return (
-      <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-indigo-950 via-slate-900 to-slate-950 text-slate-300 p-5 text-center select-none relative">
-        <div className="w-12 h-12 rounded-2xl bg-indigo-600/25 border border-indigo-500/30 flex items-center justify-center text-indigo-400 mb-2.5 shadow-inner">
-          <Code2 size={22} />
-        </div>
-        <span className="text-xs font-semibold tracking-wide text-white line-clamp-1 max-w-[200px]">
-          {alt}
-        </span>
-        <span className="text-[10px] font-mono text-indigo-300/80 mt-1 uppercase tracking-wider">
-          {language || category || 'Software Project'}
-        </span>
-      </div>
-    );
-  }
-
-  return (
-    <div className="relative w-full h-full">
-      {!loaded && (
-        <div className="absolute inset-0 bg-slate-200 dark:bg-slate-800 animate-pulse" />
-      )}
-      <Image
-        src={src}
-        alt={alt}
-        fill
-        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        className={`object-cover object-center group-hover:scale-105 transition-all duration-500 ${
-          loaded ? 'opacity-100' : 'opacity-0'
-        }`}
-        referrerPolicy="no-referrer"
-        priority={priority}
-        onLoad={() => setLoaded(true)}
-        onError={() => setImgError(true)}
-      />
-    </div>
-  );
-}
+import { GithubCodeSnippet } from './GithubCodeSnippet';
 
 type ProjectFilter = 'all' | 'ai' | 'web' | 'java' | 'python';
 
@@ -135,7 +69,7 @@ export function Projects() {
         {/* Section Header with GitHub Live Sync */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-10 gap-6">
           <div>
-            <SectionHeading>Engineering Projects</SectionHeading>
+            <SectionHeading>Projects</SectionHeading>
             <p className="text-slate-600 dark:text-slate-300 text-sm md:text-base mt-1">
               Real-world software systems, AI pipelines, full-stack applications, and repositories hosted on GitHub.
             </p>
@@ -240,33 +174,13 @@ export function Projects() {
                 </div>
               </div>
 
-              <div className="relative h-64 sm:h-80 lg:h-full min-h-[280px] w-full bg-slate-900 rounded-2xl border border-slate-700/80 overflow-hidden shadow-2xl group-hover:border-indigo-500/50 transition-all">
-                <ProjectImageThumbnail 
-                  src={getProjectImage(featuredProject)} 
-                  alt={featuredProject.title} 
-                  priority 
+              <div className="relative h-64 sm:h-80 lg:h-full min-h-[280px] w-full bg-[#121316] rounded-2xl border border-slate-700/80 overflow-hidden shadow-2xl group-hover:border-indigo-500/50 transition-all">
+                <GithubCodeSnippet 
+                  githubUrl={featuredProject.github} 
+                  title={featuredProject.title}
                   language={featuredProject.language}
                   category={featuredProject.category}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/25 to-transparent pointer-events-none" />
-
-                <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
-                  <span className="px-3 py-1 bg-black/60 backdrop-blur-md rounded-full text-xs font-mono font-medium text-white border border-white/10 flex items-center gap-1.5 shadow-sm">
-                    <Sparkles size={12} className="text-amber-400" />
-                    Spotlight Project
-                  </span>
-                </div>
-
-                <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-xs text-white/90 font-medium z-10">
-                  <span className="px-3 py-1.5 bg-black/60 backdrop-blur-md rounded-xl border border-white/10 font-mono">
-                    {featuredProject.language || (featuredProject.tags && featuredProject.tags[0]) || 'Featured'}
-                  </span>
-                  {featuredProject.demoUrl && (
-                    <span className="px-3 py-1.5 bg-indigo-600/90 backdrop-blur-md rounded-xl text-white font-semibold flex items-center gap-1.5 shadow-sm">
-                      <Globe size={13} /> Interactive Demo
-                    </span>
-                  )}
-                </div>
               </div>
             </div>
           </motion.div>
@@ -339,8 +253,6 @@ export function Projects() {
 }
 
 function ProjectCard({ project, index }: { project: Project; index: number }) {
-  const imageUrl = getProjectImage(project);
-
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
@@ -349,71 +261,60 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
       transition={{ delay: Math.min(index * 0.05, 0.4) }}
       className="bg-white dark:bg-slate-800/90 rounded-3xl p-6 border border-slate-200/90 dark:border-slate-700/80 shadow-xs dark:shadow-slate-950/50 hover:shadow-xl hover:border-indigo-200 dark:hover:border-indigo-500/50 transition-all group flex flex-col h-full relative overflow-hidden"
     >
-      {/* Visual Image / Placeholder Container */}
-      <div className="relative w-full h-44 mb-5 rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 shadow-inner group/thumb">
-        <ProjectImageThumbnail
-          src={imageUrl}
-          alt={project.title}
-          category={project.category}
-          language={project.language}
-        />
-
-        {/* Subtle Dark Gradient Overlay for Badges */}
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-black/25 pointer-events-none" />
-
-        {/* Top Floating Badges */}
-        <div className="absolute top-3 left-3 right-3 flex items-center justify-between pointer-events-none z-10">
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-950/80 backdrop-blur-md text-white text-xs font-mono font-medium border border-white/10 shadow-xs">
-            <Folder size={13} className="text-indigo-400" />
+      {/* Card Header with Category Icon, Stars, Forks, and GitHub Link */}
+      <div className="relative z-10 flex justify-between items-center mb-3">
+        <div className="flex items-center gap-2">
+          <div className="p-2.5 bg-indigo-50 dark:bg-indigo-950/60 rounded-xl text-indigo-600 dark:text-indigo-400 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+            <Folder size={18} />
+          </div>
+          <span className="text-xs font-mono font-semibold text-slate-700 dark:text-slate-300">
             {project.language || (project.tags && project.tags[0]) || 'Project'}
           </span>
-
-          <div className="flex items-center gap-1.5 pointer-events-auto">
-            {project.stars !== undefined && project.stars > 0 && (
-              <span className="flex items-center gap-1 text-[11px] font-semibold text-amber-300 bg-slate-950/80 backdrop-blur-md px-2 py-0.5 rounded-lg border border-amber-500/30">
-                <Star size={11} className="fill-amber-400 text-amber-400" />
-                {project.stars}
-              </span>
-            )}
-            {project.forks !== undefined && project.forks > 0 && (
-              <span className="flex items-center gap-1 text-[11px] font-semibold text-slate-200 bg-slate-950/80 backdrop-blur-md px-2 py-0.5 rounded-lg border border-white/10">
-                <GitFork size={11} />
-                {project.forks}
-              </span>
-            )}
-            <a
-              href={formatUrl(project.github)}
-              target="_blank"
-              rel="noreferrer"
-              className="p-1.5 text-white/80 hover:text-white bg-slate-950/80 backdrop-blur-md hover:bg-indigo-600 rounded-lg border border-white/10 transition-colors shadow-xs"
-              title="Open GitHub repository"
-            >
-              <Github size={14} />
-            </a>
-          </div>
         </div>
 
-        {/* Bottom Overlay Label */}
-        <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between text-[11px] text-white/90 pointer-events-none z-10">
-          <span className="font-mono text-slate-300 text-xs truncate max-w-[200px]">
-            {project.category ? project.category.toUpperCase() : 'CODE'}
-          </span>
-          {project.demoUrl && (
-            <span className="px-2 py-0.5 bg-emerald-500/90 backdrop-blur-xs text-white rounded-md text-[10px] font-bold tracking-wide">
-              LIVE DEMO
+        <div className="flex items-center gap-2">
+          {project.stars !== undefined && project.stars > 0 && (
+            <span className="flex items-center gap-1 text-[11px] font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700/60 px-2 py-0.5 rounded-lg border border-slate-200/80 dark:border-slate-600/60">
+              <Star size={11} className="fill-amber-400 text-amber-400" />
+              {project.stars}
             </span>
           )}
+          {project.forks !== undefined && project.forks > 0 && (
+            <span className="flex items-center gap-1 text-[11px] font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700/60 px-2 py-0.5 rounded-lg border border-slate-200/80 dark:border-slate-600/60">
+              <GitFork size={11} />
+              {project.forks}
+            </span>
+          )}
+          <a
+            href={formatUrl(project.github)}
+            target="_blank"
+            rel="noreferrer"
+            className="p-1.5 text-slate-400 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-700/60 rounded-lg transition-colors"
+            title="Open GitHub repository"
+          >
+            <Github size={16} />
+          </a>
         </div>
       </div>
 
-      <h4 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-2.5 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-2">
+      {/* Code Snippet Window ("code jaysa image") */}
+      <div className="relative w-full h-40 mb-4 rounded-2xl border border-slate-700/80 overflow-hidden bg-[#121316] shadow-inner group-hover:border-indigo-500/50 transition-colors">
+        <GithubCodeSnippet 
+          githubUrl={project.github}
+          title={project.title}
+          language={project.language}
+          category={project.category}
+        />
+      </div>
+
+      <h4 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-2">
         {project.title}
       </h4>
-      <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-5 flex-1 line-clamp-3">
+      <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-4 flex-1 line-clamp-3">
         {project.description}
       </p>
 
-      <div className="flex flex-wrap gap-1.5 mb-5 mt-auto">
+      <div className="flex flex-wrap gap-1.5 mb-4 mt-auto">
         {project.tags.slice(0, 4).map((tag, tagIdx) => (
           <span key={tagIdx} className="text-xs font-mono text-indigo-600 dark:text-indigo-300 bg-indigo-50/80 dark:bg-indigo-950/60 px-2.5 py-1 rounded-md">
             {tag}
