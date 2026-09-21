@@ -8,7 +8,7 @@ export function About() {
   const paragraphs = data.aboutBio.split('\n').filter(p => p.trim() !== '');
 
   return (
-    <section id="about" className="py-24 bg-white">
+    <section id="about" className="py-24 scroll-mt-20 bg-white dark:bg-slate-900 transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <SectionHeading>About Me</SectionHeading>
         
@@ -17,7 +17,7 @@ export function About() {
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-100px" }}
-            className="prose prose-slate lg:prose-lg text-slate-600 leading-relaxed"
+            className="prose prose-slate dark:prose-invert lg:prose-lg text-slate-600 dark:text-slate-300 leading-relaxed"
           >
             {paragraphs.map((p, i) => (
               <p key={i} className={i > 0 ? "mt-4" : ""}>
@@ -25,14 +25,14 @@ export function About() {
                 {p.includes("LDC Institute of Technical Studies") && i === 0 ? (
                   <>
                     I am a 7th-semester B.Tech Computer Science student at the 
-                    <strong> LDC Institute of Technical Studies</strong>, affiliated with 
+                    <strong className="text-slate-800 dark:text-slate-100"> LDC Institute of Technical Studies</strong>, affiliated with 
                     Dr. A.P.J. Abdul Kalam Technical University (AKTU).
                   </>
                 ) : p.includes("Python, Java, and JavaScript") && i === 1 ? (
                   <>
                     With a strong foundation in computer science principles, I have a deep interest in 
                     software development, frontend development, and real-world problem solving. My 
-                    technical toolkit primarily revolves around <strong>Python, Java, and JavaScript</strong>.
+                    technical toolkit primarily revolves around <strong className="text-slate-800 dark:text-slate-100">Python, Java, and JavaScript</strong>.
                   </>
                 ) : (
                   p

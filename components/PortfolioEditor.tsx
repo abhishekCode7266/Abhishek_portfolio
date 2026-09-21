@@ -222,26 +222,26 @@ export function PortfolioEditor() {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 sm:p-6">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 dark:bg-slate-950/70 backdrop-blur-sm p-4 sm:p-6">
       <motion.div 
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="bg-white w-full max-w-5xl h-[85vh] mx-auto rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row border border-slate-200"
+        className="bg-white dark:bg-slate-900 w-full max-w-5xl h-[85vh] mx-auto rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row border border-slate-200 dark:border-slate-800"
       >
         {/* Sidebar */}
-        <div className="w-full md:w-64 bg-slate-50 border-r border-slate-200 p-4 flex flex-row md:flex-col gap-2 overflow-x-auto shrink-0">
+        <div className="w-full md:w-64 bg-slate-50 dark:bg-slate-950/60 border-r border-slate-200 dark:border-slate-800 p-4 flex flex-row md:flex-col gap-2 overflow-x-auto shrink-0">
           <div className="flex justify-between items-center mb-4 md:mb-8 md:px-2 shrink-0">
             <div>
-              <h2 className="font-bold text-slate-800 text-lg">Portfolio Editor</h2>
-              <p className="text-xs text-slate-500">Update your content</p>
+              <h2 className="font-bold text-slate-800 dark:text-slate-100 text-lg">Portfolio Editor</h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Update your content</p>
             </div>
-            <button onClick={() => setIsEditorOpen(false)} className="p-2 text-slate-500 bg-slate-200 rounded-full hover:bg-slate-300 transition-colors" title="Close"><X size={16}/></button>
+            <button onClick={() => setIsEditorOpen(false)} className="p-2 text-slate-500 dark:text-slate-400 bg-slate-200 dark:bg-slate-800 rounded-full hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors cursor-pointer" title="Close"><X size={16}/></button>
           </div>
           {TABS.map(tab => (
             <button 
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`shrink-0 text-left px-4 py-3 rounded-xl text-sm font-medium transition-colors ${activeTab === tab ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-600 hover:bg-slate-200 hover:text-slate-900'}`}
+              className={`shrink-0 text-left px-4 py-3 rounded-xl text-sm font-medium transition-colors cursor-pointer ${activeTab === tab ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100'}`}
             >
               {tab}
             </button>
@@ -249,9 +249,9 @@ export function PortfolioEditor() {
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 p-6 md:p-10 overflow-y-auto bg-white relative flex flex-col">
-          <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 pb-4 border-b border-slate-100 shrink-0 gap-4">
-            <h3 className="text-2xl font-bold text-slate-800">{activeTab}</h3>
+        <div className="flex-1 p-6 md:p-10 overflow-y-auto bg-white dark:bg-slate-900 relative flex flex-col">
+          <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 pb-4 border-b border-slate-100 dark:border-slate-800 shrink-0 gap-4">
+            <h3 className="text-2xl font-bold text-slate-800 dark:text-slate-100">{activeTab}</h3>
             <div className="flex items-center gap-3 flex-wrap">
               {/* Quick Export & Sync buttons */}
               <button

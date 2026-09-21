@@ -1,11 +1,77 @@
 'use client';
 import { useState, useMemo } from 'react';
+import Image from 'next/image';
 import { motion } from 'motion/react';
 import { SectionHeading } from './SectionHeading';
-import { Github, Folder, ExternalLink, Globe, RefreshCw, CheckCircle2, Star, GitFork, Search, Sparkles } from 'lucide-react';
+import { Github, Folder, ExternalLink, Globe, RefreshCw, CheckCircle2, Star, GitFork, Search, Sparkles, Code2 } from 'lucide-react';
 import { usePortfolio, Project } from '@/app/context/PortfolioContext';
 import { formatUrl } from '@/lib/utils';
-import { GithubCodeSnippet } from './GithubCodeSnippet';
+
+export function getProjectImage(project: { title: string; imageUrl?: string; id?: string; language?: string }): string {
+  if (project.imageUrl && project.imageUrl.trim()) {
+    return project.imageUrl.trim();
+  }
+  const cleanSeed = (project.title || project.id || 'project')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '') || 'portfolio-project';
+  return `https://picsum.photos/seed/${cleanSeed}/800/480`;
+}
+
+function ProjectImageThumbnail({ 
+  src, 
+  alt, 
+  priority = false,
+  language,
+  category,
+}: { 
+  src: string; 
+  alt: string; 
+  priority?: boolean;
+  language?: string;
+  category?: string;
+}) {
+  const [imgError, setImgError] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+
+  // Fallback visual placeholder when image fails to load or offline
+  if (imgError) {
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-indigo-950 via-slate-900 to-slate-950 text-slate-300 p-5 text-center select-none relative">
+        <div className="w-12 h-12 rounded-2xl bg-indigo-600/25 border border-indigo-500/30 flex items-center justify-center text-indigo-400 mb-2.5 shadow-inner">
+          <Code2 size={22} />
+        </div>
+        <span className="text-xs font-semibold tracking-wide text-white line-clamp-1 max-w-[200px]">
+          {alt}
+        </span>
+        <span className="text-[10px] font-mono text-indigo-300/80 mt-1 uppercase tracking-wider">
+          {language || category || 'Software Project'}
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative w-full h-full">
+      {!loaded && (
+        <div className="absolute inset-0 bg-slate-200 dark:bg-slate-800 animate-pulse" />
+      )}
+      <Image
+        src={src}
+        alt={alt}
+        fill
+        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        className={`object-cover object-center group-hover:scale-105 transition-all duration-500 ${
+          loaded ? 'opacity-100' : 'opacity-0'
+        }`}
+        referrerPolicy="no-referrer"
+        priority={priority}
+        onLoad={() => setLoaded(true)}
+        onError={() => setImgError(true)}
+      />
+    </div>
+  );
+}
 
 type ProjectFilter = 'all' | 'ai' | 'web' | 'java' | 'python';
 
@@ -63,20 +129,20 @@ export function Projects() {
   }, [data.projects, featuredProject, activeFilter, searchQuery]);
 
   return (
-    <section id="projects" className="py-24 bg-white relative">
+    <section id="projects" className="py-24 scroll-mt-20 bg-white dark:bg-slate-900 relative transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header with GitHub Live Sync */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-10 gap-6">
           <div>
             <SectionHeading>Engineering Projects</SectionHeading>
-            <p className="text-slate-600 text-sm md:text-base mt-1">
+            <p className="text-slate-600 dark:text-slate-300 text-sm md:text-base mt-1">
               Real-world software systems, AI pipelines, full-stack applications, and repositories hosted on GitHub.
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            <span className="inline-flex items-center gap-1.5 px-3 py-2 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold rounded-xl">
+            <span className="inline-flex items-center gap-1.5 px-3 py-2 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 text-xs font-semibold rounded-xl">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               Live GitHub Sync
             </span>
@@ -84,14 +150,14 @@ export function Projects() {
             <button
               onClick={handleSync}
               disabled={isSyncingGitHub}
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-900 hover:bg-slate-800 disabled:bg-slate-400 text-white text-xs sm:text-sm font-semibold rounded-xl shadow-xs transition-all cursor-pointer"
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-900 hover:bg-slate-800 dark:bg-indigo-600 dark:hover:bg-indigo-500 disabled:bg-slate-400 dark:disabled:bg-slate-700 text-white text-xs sm:text-sm font-semibold rounded-xl shadow-xs transition-all cursor-pointer"
               title="Mirror latest repositories directly from GitHub (auto-adds new repos, removes deleted ones)"
             >
               <RefreshCw size={15} className={isSyncingGitHub ? 'animate-spin text-indigo-400' : 'text-slate-300'} />
               <span>{isSyncingGitHub ? 'Mirroring Repositories...' : 'Sync with GitHub'}</span>
             </button>
 
-            <span className="inline-flex items-center gap-1.5 px-3 py-2 bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-semibold rounded-xl">
+            <span className="inline-flex items-center gap-1.5 px-3 py-2 bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-100 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 text-xs font-semibold rounded-xl">
               <Github size={14} />
               {data.projects.length} Repositories Live
             </span>
@@ -104,9 +170,9 @@ export function Projects() {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            className="mb-8 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center gap-3 text-emerald-800 text-sm font-medium shadow-xs"
+            className="mb-8 p-4 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 rounded-2xl flex items-center gap-3 text-emerald-800 dark:text-emerald-300 text-sm font-medium shadow-xs"
           >
-            <CheckCircle2 size={18} className="text-emerald-600 shrink-0" />
+            <CheckCircle2 size={18} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
             <span>{syncStatus}</span>
           </motion.div>
         )}
@@ -174,17 +240,33 @@ export function Projects() {
                 </div>
               </div>
 
-              <div className="relative h-64 sm:h-80 lg:h-full min-h-[260px] w-full bg-[#1e1e1e] rounded-2xl border border-slate-700 overflow-hidden shadow-2xl group-hover:border-indigo-500/50 transition-colors">
-                {featuredProject.imageUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img 
-                    src={featuredProject.imageUrl} 
-                    alt={featuredProject.title} 
-                    className="w-full h-full object-cover object-top" 
-                  />
-                ) : (
-                  <GithubCodeSnippet githubUrl={featuredProject.github} />
-                )}
+              <div className="relative h-64 sm:h-80 lg:h-full min-h-[280px] w-full bg-slate-900 rounded-2xl border border-slate-700/80 overflow-hidden shadow-2xl group-hover:border-indigo-500/50 transition-all">
+                <ProjectImageThumbnail 
+                  src={getProjectImage(featuredProject)} 
+                  alt={featuredProject.title} 
+                  priority 
+                  language={featuredProject.language}
+                  category={featuredProject.category}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/25 to-transparent pointer-events-none" />
+
+                <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
+                  <span className="px-3 py-1 bg-black/60 backdrop-blur-md rounded-full text-xs font-mono font-medium text-white border border-white/10 flex items-center gap-1.5 shadow-sm">
+                    <Sparkles size={12} className="text-amber-400" />
+                    Spotlight Project
+                  </span>
+                </div>
+
+                <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-xs text-white/90 font-medium z-10">
+                  <span className="px-3 py-1.5 bg-black/60 backdrop-blur-md rounded-xl border border-white/10 font-mono">
+                    {featuredProject.language || (featuredProject.tags && featuredProject.tags[0]) || 'Featured'}
+                  </span>
+                  {featuredProject.demoUrl && (
+                    <span className="px-3 py-1.5 bg-indigo-600/90 backdrop-blur-md rounded-xl text-white font-semibold flex items-center gap-1.5 shadow-sm">
+                      <Globe size={13} /> Interactive Demo
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
           </motion.div>
@@ -205,10 +287,10 @@ export function Projects() {
               <button
                 key={tab.id}
                 onClick={() => setActiveFilter(tab.id)}
-                className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all ${
+                className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all cursor-pointer ${
                   activeFilter === tab.id
                     ? 'bg-indigo-600 text-white shadow-sm'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-transparent dark:border-slate-700/80'
                 }`}
               >
                 {tab.label}
@@ -217,24 +299,24 @@ export function Projects() {
           </div>
 
           <div className="relative w-full sm:w-64">
-            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
             <input
               type="text"
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               placeholder="Search repositories..."
-              className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
+              className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
             />
           </div>
         </div>
 
         {/* Other Projects Grid */}
         {filteredProjects.length === 0 ? (
-          <div className="text-center py-16 bg-slate-50 border border-slate-200 rounded-3xl">
-            <p className="text-slate-500 text-sm">No repositories found matching &ldquo;{searchQuery}&rdquo;</p>
+          <div className="text-center py-16 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-3xl">
+            <p className="text-slate-500 dark:text-slate-400 text-sm">No repositories found matching &ldquo;{searchQuery}&rdquo;</p>
             <button
               onClick={() => { setSearchQuery(''); setActiveFilter('all'); }}
-              className="mt-3 text-xs font-semibold text-indigo-600 hover:underline"
+              className="mt-3 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer"
             >
               Clear filters
             </button>
@@ -257,78 +339,94 @@ export function Projects() {
 }
 
 function ProjectCard({ project, index }: { project: Project; index: number }) {
+  const imageUrl = getProjectImage(project);
+
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ delay: Math.min(index * 0.05, 0.4) }}
-      className="bg-white rounded-3xl p-7 border border-slate-200/90 shadow-xs hover:shadow-xl hover:border-indigo-200 transition-all group flex flex-col h-full relative overflow-hidden"
+      className="bg-white dark:bg-slate-800/90 rounded-3xl p-6 border border-slate-200/90 dark:border-slate-700/80 shadow-xs dark:shadow-slate-950/50 hover:shadow-xl hover:border-indigo-200 dark:hover:border-indigo-500/50 transition-all group flex flex-col h-full relative overflow-hidden"
     >
-      <div className="relative z-10 flex justify-between items-start mb-4">
-        <div className="p-3 bg-indigo-50 rounded-2xl text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-          <Folder size={24} />
+      {/* Visual Image / Placeholder Container */}
+      <div className="relative w-full h-44 mb-5 rounded-2xl overflow-hidden bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 shadow-inner group/thumb">
+        <ProjectImageThumbnail
+          src={imageUrl}
+          alt={project.title}
+          category={project.category}
+          language={project.language}
+        />
+
+        {/* Subtle Dark Gradient Overlay for Badges */}
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-black/25 pointer-events-none" />
+
+        {/* Top Floating Badges */}
+        <div className="absolute top-3 left-3 right-3 flex items-center justify-between pointer-events-none z-10">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-950/80 backdrop-blur-md text-white text-xs font-mono font-medium border border-white/10 shadow-xs">
+            <Folder size={13} className="text-indigo-400" />
+            {project.language || (project.tags && project.tags[0]) || 'Project'}
+          </span>
+
+          <div className="flex items-center gap-1.5 pointer-events-auto">
+            {project.stars !== undefined && project.stars > 0 && (
+              <span className="flex items-center gap-1 text-[11px] font-semibold text-amber-300 bg-slate-950/80 backdrop-blur-md px-2 py-0.5 rounded-lg border border-amber-500/30">
+                <Star size={11} className="fill-amber-400 text-amber-400" />
+                {project.stars}
+              </span>
+            )}
+            {project.forks !== undefined && project.forks > 0 && (
+              <span className="flex items-center gap-1 text-[11px] font-semibold text-slate-200 bg-slate-950/80 backdrop-blur-md px-2 py-0.5 rounded-lg border border-white/10">
+                <GitFork size={11} />
+                {project.forks}
+              </span>
+            )}
+            <a
+              href={formatUrl(project.github)}
+              target="_blank"
+              rel="noreferrer"
+              className="p-1.5 text-white/80 hover:text-white bg-slate-950/80 backdrop-blur-md hover:bg-indigo-600 rounded-lg border border-white/10 transition-colors shadow-xs"
+              title="Open GitHub repository"
+            >
+              <Github size={14} />
+            </a>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          {project.stars !== undefined && project.stars > 0 && (
-            <span className="flex items-center gap-1 text-xs font-semibold text-slate-500 bg-slate-50 px-2 py-1 rounded-md border border-slate-100">
-              <Star size={12} className="fill-amber-400 text-amber-400" />
-              {project.stars}
+        {/* Bottom Overlay Label */}
+        <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between text-[11px] text-white/90 pointer-events-none z-10">
+          <span className="font-mono text-slate-300 text-xs truncate max-w-[200px]">
+            {project.category ? project.category.toUpperCase() : 'CODE'}
+          </span>
+          {project.demoUrl && (
+            <span className="px-2 py-0.5 bg-emerald-500/90 backdrop-blur-xs text-white rounded-md text-[10px] font-bold tracking-wide">
+              LIVE DEMO
             </span>
           )}
-          {project.forks !== undefined && project.forks > 0 && (
-            <span className="flex items-center gap-1 text-xs font-semibold text-slate-500 bg-slate-50 px-2 py-1 rounded-md border border-slate-100">
-              <GitFork size={12} />
-              {project.forks}
-            </span>
-          )}
-          <a
-            href={formatUrl(project.github)}
-            target="_blank"
-            rel="noreferrer"
-            className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-slate-50 rounded-xl transition-colors"
-            title="Open GitHub repository"
-          >
-            <Github size={18} />
-          </a>
         </div>
       </div>
 
-      {project.imageUrl ? (
-        <div className="relative z-10 w-full h-40 mb-5 rounded-2xl border border-slate-200 overflow-hidden bg-slate-100 shadow-inner group-hover:border-indigo-300 transition-colors">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={project.imageUrl} alt={project.title} className="w-full h-full object-cover object-top" />
-        </div>
-      ) : project.github ? (
-        <div className="relative z-10 w-full h-32 mb-5 rounded-2xl border border-slate-700 overflow-hidden bg-[#1e1e1e] shadow-inner group-hover:border-indigo-500/50 transition-colors">
-          <div className="absolute inset-0 scale-[0.60] origin-top-left w-[166%] h-[166%]">
-            <GithubCodeSnippet githubUrl={project.github} />
-          </div>
-        </div>
-      ) : null}
-      
-      <h4 className="relative z-10 text-lg font-bold text-slate-900 mb-2.5 group-hover:text-indigo-600 transition-colors line-clamp-2">
+      <h4 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-2.5 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-2">
         {project.title}
       </h4>
-      <p className="relative z-10 text-slate-600 text-sm leading-relaxed mb-5 flex-1 line-clamp-3">
+      <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-5 flex-1 line-clamp-3">
         {project.description}
       </p>
-      
-      <div className="relative z-10 flex flex-wrap gap-1.5 mb-5 mt-auto">
+
+      <div className="flex flex-wrap gap-1.5 mb-5 mt-auto">
         {project.tags.slice(0, 4).map((tag, tagIdx) => (
-          <span key={tagIdx} className="text-xs font-mono text-indigo-600 bg-indigo-50/80 px-2.5 py-1 rounded-md">
+          <span key={tagIdx} className="text-xs font-mono text-indigo-600 dark:text-indigo-300 bg-indigo-50/80 dark:bg-indigo-950/60 px-2.5 py-1 rounded-md">
             {tag}
           </span>
         ))}
       </div>
 
-      <div className="relative z-10 flex items-center justify-between mt-auto pt-4 border-t border-slate-100">
+      <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-100 dark:border-slate-700/80">
         <a 
           href={formatUrl(project.github)} 
           target="_blank" 
           rel="noreferrer" 
-          className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 hover:text-indigo-600 transition-colors"
+          className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
         >
           <Github size={15} /> Source Code
         </a>
@@ -337,7 +435,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
             href={formatUrl(project.demoUrl)} 
             target="_blank" 
             rel="noreferrer" 
-            className="flex items-center gap-1.5 text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition-colors bg-indigo-50 px-2.5 py-1 rounded-lg"
+            className="flex items-center gap-1.5 text-xs font-semibold text-indigo-600 dark:text-indigo-300 hover:text-indigo-800 dark:hover:text-indigo-200 transition-colors bg-indigo-50 dark:bg-indigo-950/70 px-2.5 py-1 rounded-lg"
           >
             <ExternalLink size={14} /> Live Demo
           </a>

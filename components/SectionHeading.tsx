@@ -8,7 +8,7 @@ export function SectionHeading({ children }: { children: React.ReactNode }) {
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        className="text-3xl md:text-4xl font-bold text-slate-800 tracking-tight"
+        className="text-3xl md:text-4xl font-bold text-slate-800 dark:text-slate-100 tracking-tight"
       >
         {children}
       </motion.h2>
@@ -17,7 +17,7 @@ export function SectionHeading({ children }: { children: React.ReactNode }) {
         whileInView={{ opacity: 1, scaleX: 1 }}
         viewport={{ once: true }}
         transition={{ delay: 0.2 }}
-        className="h-1.5 w-24 bg-indigo-600 mt-4 rounded-full"
+        className="h-1.5 w-24 bg-indigo-600 dark:bg-indigo-500 mt-4 rounded-full"
       />
     </div>
   );

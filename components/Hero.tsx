@@ -23,11 +23,26 @@ export function Hero() {
     }
   };
 
+  const scrollToProjects = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    const element = document.getElementById('projects');
+    if (element) {
+      const navOffset = 80;
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - navOffset;
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth',
+      });
+      window.history.pushState(null, '', '#projects');
+    }
+  };
+
   return (
-    <section className="relative min-h-screen flex items-center justify-center pt-20 pb-16 overflow-hidden bg-[#f4f7fa]">
+    <section id="hero" className="relative min-h-screen flex items-center justify-center pt-20 pb-16 overflow-hidden bg-[#f4f7fa] dark:bg-[#0b0f19] transition-colors duration-200">
       {/* Blurred background blobs */}
-      <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-indigo-200/50 rounded-full mix-blend-multiply filter blur-[100px] animate-pulse" />
-      <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-blue-200/40 rounded-full mix-blend-multiply filter blur-[100px] animate-pulse" style={{ animationDelay: '2s' }} />
+      <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-indigo-200/50 dark:bg-indigo-950/40 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-[100px] animate-pulse" />
+      <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-blue-200/40 dark:bg-blue-950/30 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-[100px] animate-pulse" style={{ animationDelay: '2s' }} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 grid lg:grid-cols-2 gap-12 lg:gap-8 items-center w-full">
         <motion.div 
@@ -36,21 +51,21 @@ export function Hero() {
           transition={{ duration: 0.8 }}
           className="flex flex-col items-center text-center lg:items-start lg:text-left gap-6 order-2 lg:order-1"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-sm font-semibold shadow-sm">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-100 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 text-sm font-semibold shadow-sm">
             <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
             Available for Internships
           </div>
           
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-slate-900 leading-[1.1] tracking-tight">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-white leading-[1.1] tracking-tight">
             Hi, I&apos;m <br className="hidden lg:block" />
-            <span className="text-indigo-600">Abhishek Singh Yadav</span>
+            <span className="text-indigo-600 dark:text-indigo-400">Abhishek Singh Yadav</span>
           </h1>
           
-          <h2 className="text-xl sm:text-2xl font-medium text-slate-600">
+          <h2 className="text-xl sm:text-2xl font-medium text-slate-600 dark:text-slate-300">
             Computer Science Student &bull; Software Developer
           </h2>
           
-          <p className="text-slate-600 text-lg leading-relaxed max-w-xl">
+          <p className="text-slate-600 dark:text-slate-300 text-lg leading-relaxed max-w-xl">
             B.Tech Computer Science undergrad at LDC Institute of Technical Studies. 
             Passionate about software development, web development, Python, Java, 
             and building practical applications.
@@ -59,7 +74,8 @@ export function Hero() {
           <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 mt-4">
             <a 
               href="#projects"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200"
+              onClick={scrollToProjects}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 dark:bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 dark:hover:bg-indigo-500 transition-colors shadow-lg shadow-indigo-200 dark:shadow-none cursor-pointer"
             >
               View Projects
               <ArrowDown size={18} />
@@ -69,8 +85,8 @@ export function Hero() {
               download={data.resumeUrl ? data.resumeName || "Resume.pdf" : undefined}
               className={`inline-flex items-center gap-2 px-6 py-3 font-medium rounded-xl transition-colors shadow-sm border ${
                 data.resumeUrl 
-                  ? "bg-white text-slate-700 hover:bg-slate-50 border-slate-200" 
-                  : "bg-slate-50 text-slate-400 border-slate-100 cursor-not-allowed"
+                  ? "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700" 
+                  : "bg-slate-50 dark:bg-slate-800/50 text-slate-400 dark:text-slate-500 border-slate-100 dark:border-slate-800 cursor-not-allowed"
               }`}
               onClick={(e) => {
                 if (!data.resumeUrl) {
@@ -85,43 +101,43 @@ export function Hero() {
           </div>
 
           <div className="flex flex-wrap gap-4 mt-4">
-            <a href={formatUrl(data.socialLinks?.github)} target="_blank" rel="noreferrer" className="p-3 text-slate-500 hover:text-indigo-600 hover:-translate-y-1 transition-all bg-white rounded-full shadow-sm border border-slate-100">
+            <a href={formatUrl(data.socialLinks?.github)} target="_blank" rel="noreferrer" className="p-3 text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:-translate-y-1 transition-all bg-white dark:bg-slate-800 rounded-full shadow-sm border border-slate-100 dark:border-slate-700">
               <Github size={22} />
             </a>
-            <a href={formatUrl(data.socialLinks?.linkedin)} target="_blank" rel="noreferrer" className="p-3 text-slate-500 hover:text-indigo-600 hover:-translate-y-1 transition-all bg-white rounded-full shadow-sm border border-slate-100">
+            <a href={formatUrl(data.socialLinks?.linkedin)} target="_blank" rel="noreferrer" className="p-3 text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:-translate-y-1 transition-all bg-white dark:bg-slate-800 rounded-full shadow-sm border border-slate-100 dark:border-slate-700">
               <Linkedin size={22} />
             </a>
             {data.socialLinks?.whatsapp && (
-              <a href={`https://wa.me/${data.socialLinks.whatsapp.replace(/[^0-9]/g, '')}`} target="_blank" rel="noreferrer" className="p-3 text-slate-500 hover:text-green-500 hover:-translate-y-1 transition-all bg-white rounded-full shadow-sm border border-slate-100" title="WhatsApp">
+              <a href={`https://wa.me/${data.socialLinks.whatsapp.replace(/[^0-9]/g, '')}`} target="_blank" rel="noreferrer" className="p-3 text-slate-500 dark:text-slate-400 hover:text-green-500 hover:-translate-y-1 transition-all bg-white dark:bg-slate-800 rounded-full shadow-sm border border-slate-100 dark:border-slate-700" title="WhatsApp">
                 <MessageCircle size={22} />
               </a>
             )}
             {data.socialLinks?.telegram && (
-              <a href={formatUrl(data.socialLinks.telegram)} target="_blank" rel="noreferrer" className="p-3 text-slate-500 hover:text-blue-500 hover:-translate-y-1 transition-all bg-white rounded-full shadow-sm border border-slate-100" title="Telegram">
+              <a href={formatUrl(data.socialLinks.telegram)} target="_blank" rel="noreferrer" className="p-3 text-slate-500 dark:text-slate-400 hover:text-blue-500 hover:-translate-y-1 transition-all bg-white dark:bg-slate-800 rounded-full shadow-sm border border-slate-100 dark:border-slate-700" title="Telegram">
                 <Send size={22} />
               </a>
             )}
             {data.socialLinks?.instagram && (
-              <a href={formatUrl(data.socialLinks.instagram)} target="_blank" rel="noreferrer" className="p-3 text-slate-500 hover:text-pink-600 hover:-translate-y-1 transition-all bg-white rounded-full shadow-sm border border-slate-100" title="Instagram">
+              <a href={formatUrl(data.socialLinks.instagram)} target="_blank" rel="noreferrer" className="p-3 text-slate-500 dark:text-slate-400 hover:text-pink-600 hover:-translate-y-1 transition-all bg-white dark:bg-slate-800 rounded-full shadow-sm border border-slate-100 dark:border-slate-700" title="Instagram">
                 <Instagram size={22} />
               </a>
             )}
             {data.socialLinks?.facebook && (
-              <a href={formatUrl(data.socialLinks.facebook)} target="_blank" rel="noreferrer" className="p-3 text-slate-500 hover:text-blue-600 hover:-translate-y-1 transition-all bg-white rounded-full shadow-sm border border-slate-100" title="Facebook">
+              <a href={formatUrl(data.socialLinks.facebook)} target="_blank" rel="noreferrer" className="p-3 text-slate-500 dark:text-slate-400 hover:text-blue-600 hover:-translate-y-1 transition-all bg-white dark:bg-slate-800 rounded-full shadow-sm border border-slate-100 dark:border-slate-700" title="Facebook">
                 <Facebook size={22} />
               </a>
             )}
             {data.socialLinks?.twitter && (
-              <a href={formatUrl(data.socialLinks.twitter)} target="_blank" rel="noreferrer" className="p-3 text-slate-500 hover:text-sky-500 hover:-translate-y-1 transition-all bg-white rounded-full shadow-sm border border-slate-100" title="Twitter / X">
+              <a href={formatUrl(data.socialLinks.twitter)} target="_blank" rel="noreferrer" className="p-3 text-slate-500 dark:text-slate-400 hover:text-sky-500 hover:-translate-y-1 transition-all bg-white dark:bg-slate-800 rounded-full shadow-sm border border-slate-100 dark:border-slate-700" title="Twitter / X">
                 <Twitter size={22} />
               </a>
             )}
             {data.socialLinks?.youtube && (
-              <a href={formatUrl(data.socialLinks.youtube)} target="_blank" rel="noreferrer" className="p-3 text-slate-500 hover:text-red-600 hover:-translate-y-1 transition-all bg-white rounded-full shadow-sm border border-slate-100" title="YouTube">
+              <a href={formatUrl(data.socialLinks.youtube)} target="_blank" rel="noreferrer" className="p-3 text-slate-500 dark:text-slate-400 hover:text-red-600 hover:-translate-y-1 transition-all bg-white dark:bg-slate-800 rounded-full shadow-sm border border-slate-100 dark:border-slate-700" title="YouTube">
                 <Youtube size={22} />
               </a>
             )}
-            <a href={data.socialLinks?.email ? `mailto:${data.socialLinks.email}` : "#"} className="p-3 text-slate-500 hover:text-indigo-600 hover:-translate-y-1 transition-all bg-white rounded-full shadow-sm border border-slate-100">
+            <a href={data.socialLinks?.email ? `mailto:${data.socialLinks.email}` : "#"} className="p-3 text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:-translate-y-1 transition-all bg-white dark:bg-slate-800 rounded-full shadow-sm border border-slate-100 dark:border-slate-700">
               <Mail size={22} />
             </a>
           </div>
@@ -134,12 +150,12 @@ export function Hero() {
           className="flex justify-center order-1 lg:order-2 lg:justify-end"
         >
           <div className="relative group cursor-pointer" onClick={() => fileInputRef.current?.click()}>
-            <div className="w-56 h-56 sm:w-64 sm:h-64 lg:w-80 lg:h-80 rounded-full overflow-hidden border-8 border-white shadow-2xl bg-slate-200 relative transition-transform duration-300 group-hover:scale-[1.02]">
+            <div className="w-56 h-56 sm:w-64 sm:h-64 lg:w-80 lg:h-80 rounded-full overflow-hidden border-8 border-white dark:border-slate-800 shadow-2xl bg-slate-200 dark:bg-slate-700 relative transition-transform duration-300 group-hover:scale-[1.02]">
               {data.profileImage ? (
                 <Image src={data.profileImage} alt="Abhishek Singh Yadav" fill className="object-cover" referrerPolicy="no-referrer" />
               ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 bg-indigo-50">
-                  <Upload size={48} className="mb-4 text-indigo-300" />
+                <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 bg-indigo-50 dark:bg-slate-800">
+                  <Upload size={48} className="mb-4 text-indigo-300 dark:text-indigo-400" />
                   <span className="font-medium text-indigo-400">Upload Photo</span>
                 </div>
               )}

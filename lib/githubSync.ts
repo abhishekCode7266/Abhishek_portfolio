@@ -28,7 +28,7 @@ export interface SyncedProject {
   category?: 'ai' | 'web' | 'java' | 'python' | 'all';
 }
 
-const KNOWN_PROJECT_META: Record<string, { title: string; description: string; tags: string[]; featured?: boolean; category?: 'ai' | 'web' | 'java' | 'python' | 'all' }> = {
+const KNOWN_PROJECT_META: Record<string, { title: string; description: string; tags: string[]; featured?: boolean; category?: 'ai' | 'web' | 'java' | 'python' | 'all'; imageUrl?: string }> = {
   'carrersphere-ai': {
     title: 'CarrerSphere-Ai',
     description: 'All-in-one AI career platform for learning, interview preparation, skill development, and discovering jobs across career fields.',
@@ -221,6 +221,12 @@ export function transformRepo(repo: RawGitHubRepo): SyncedProject {
     demoUrl = undefined;
   }
 
+  const cleanSeed = (known?.title || repo.name)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '') || 'project';
+  const defaultPlaceholder = `https://picsum.photos/seed/${cleanSeed}/800/450`;
+
   return {
     id: `gh-${repo.id || repo.name}`,
     title,
@@ -228,7 +234,7 @@ export function transformRepo(repo: RawGitHubRepo): SyncedProject {
     tags,
     github: repo.html_url,
     demoUrl,
-    imageUrl: '',
+    imageUrl: known?.imageUrl || defaultPlaceholder,
     featured: known?.featured || repo.stargazers_count > 0,
     stars: repo.stargazers_count || 0,
     forks: repo.forks_count || 0,
