@@ -11,10 +11,13 @@ import { Footer } from '@/components/Footer';
 import { PortfolioEditor } from '@/components/PortfolioEditor';
 import { SectionDivider } from '@/components/SectionDivider';
 import { BackToTop } from '@/components/BackToTop';
+import { PrintHeader } from '@/components/PrintHeader';
+import { FloatingPrintButton } from '@/components/FloatingPrintButton';
 
 export default function Home() {
   return (
     <main className="min-h-screen">
+      <PrintHeader />
       <Navbar />
       <Hero />
       <SectionDivider id="separator-about" />
@@ -35,6 +38,7 @@ export default function Home() {
       <Footer />
       <PortfolioEditor />
       <BackToTop />
+      <FloatingPrintButton />
     </main>
   );
 }
