@@ -11,7 +11,8 @@ import {
   Youtube, 
   ArrowUp,
   ExternalLink,
-  Sparkles
+  Sparkles,
+  Printer
 } from 'lucide-react';
 import { usePortfolio } from '@/app/context/PortfolioContext';
 import { formatUrl } from '@/lib/utils';
@@ -128,7 +129,7 @@ export function Footer() {
               </div>
             </div>
 
-            <div className="mt-6 pt-6 border-t border-slate-800/60 flex items-center gap-3">
+            <div className="mt-6 pt-6 border-t border-slate-800/60 flex flex-wrap items-center gap-3">
               <button
                 onClick={scrollToTop}
                 title="Back to top"
@@ -137,6 +138,15 @@ export function Footer() {
               >
                 <ArrowUp size={15} />
                 Back to top
+              </button>
+
+              <button
+                onClick={() => window.print()}
+                title="Export portfolio as PDF / Print formatted for A4"
+                className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-800 hover:bg-indigo-600 text-slate-300 hover:text-white border border-slate-700/80 text-xs font-semibold transition-all cursor-pointer shadow-xs"
+              >
+                <Printer size={15} />
+                Export PDF
               </button>
             </div>
           </div>

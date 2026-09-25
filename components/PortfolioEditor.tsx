@@ -196,7 +196,7 @@ export function PortfolioEditor() {
     return (
       <button 
         onClick={() => setIsEditorOpen(true)}
-        className="fixed bottom-6 right-6 z-50 p-4 bg-indigo-600 text-white rounded-full shadow-2xl hover:bg-indigo-700 transition-all hover:scale-105 flex items-center justify-center group"
+        className="fixed bottom-6 right-6 z-50 p-4 bg-indigo-600 text-white rounded-full shadow-2xl hover:bg-indigo-700 transition-all hover:scale-105 flex items-center justify-center group no-print"
         title="Edit Portfolio Content"
       >
         <Settings size={24} className="group-hover:rotate-90 transition-transform duration-300" />
@@ -208,21 +208,21 @@ export function PortfolioEditor() {
   const handleArrayUpdate = (key: keyof typeof data, index: number, field: string, value: any) => {
     const arr = [...(data[key] as any[])];
     arr[index] = { ...arr[index], [field]: value };
-    updateData({ [key]: arr });
+    updateData({ [key]: arr }, false);
   };
 
   const handleArrayAdd = (key: keyof typeof data, emptyItem: any) => {
-    updateData({ [key]: [...(data[key] as any[]), emptyItem] });
+    updateData({ [key]: [...(data[key] as any[]), emptyItem] }, true);
   };
 
   const handleArrayRemove = (key: keyof typeof data, index: number) => {
     const arr = [...(data[key] as any[])];
     arr.splice(index, 1);
-    updateData({ [key]: arr });
+    updateData({ [key]: arr }, true);
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 dark:bg-slate-950/70 backdrop-blur-sm p-4 sm:p-6">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 dark:bg-slate-950/70 backdrop-blur-sm p-4 sm:p-6 no-print">
       <motion.div 
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -329,6 +329,84 @@ export function PortfolioEditor() {
           <div className="space-y-8 max-w-3xl flex-1 pb-10">
             {activeTab === 'General' && (
               <div className="space-y-6">
+                <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100 space-y-4">
+                  <h4 className="text-sm font-semibold text-slate-800">Personal & Profile Details</h4>
+                  
+                  {/* Career Mode Selector */}
+                  <div>
+                    <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Career Focus Mode</label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        type="button"
+                        onClick={() => updateData({ careerMode: 'internship' }, true)}
+                        className={`p-2.5 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                          (data.careerMode || 'internship') === 'internship'
+                            ? 'bg-indigo-600 text-white border-indigo-600 shadow-xs'
+                            : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                        }`}
+                      >
+                        🎓 Internship Mode
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => updateData({ careerMode: 'job' }, true)}
+                        className={`p-2.5 rounded-xl border text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                          data.careerMode === 'job'
+                            ? 'bg-indigo-600 text-white border-indigo-600 shadow-xs'
+                            : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                        }`}
+                      >
+                        💼 Full-Time Job Mode
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Full Name</label>
+                      <input 
+                        type="text" 
+                        value={data.name || ''} 
+                        onChange={e => updateData({ name: e.target.value }, false)} 
+                        className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all font-medium" 
+                        placeholder="Abhishek Singh Yadav" 
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Professional Headline</label>
+                      <input 
+                        type="text" 
+                        value={data.headline || ''} 
+                        onChange={e => updateData({ headline: e.target.value }, false)} 
+                        className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all" 
+                        placeholder="Computer Science Student • Software Developer" 
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Phone Number</label>
+                      <input 
+                        type="text" 
+                        value={data.phone || ''} 
+                        onChange={e => updateData({ phone: e.target.value }, false)} 
+                        className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all" 
+                        placeholder="+91 98765 43210" 
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5 block">Address / Location</label>
+                      <input 
+                        type="text" 
+                        value={data.address || ''} 
+                        onChange={e => updateData({ address: e.target.value }, false)} 
+                        className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all" 
+                        placeholder="Uttar Pradesh, India" 
+                      />
+                    </div>
+                  </div>
+                </div>
 
                 <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100">
                   <h4 className="text-sm font-semibold text-slate-800 mb-2">Resume Upload</h4>

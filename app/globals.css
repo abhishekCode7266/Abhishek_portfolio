@@ -6,3 +6,275 @@ html {
   scroll-behavior: smooth;
   scroll-padding-top: 5.5rem;
 }
+
+/* ==========================================================================
+   Print & PDF Export Specific Styles (A4 Page Formatting & UI Cleanup)
+   ========================================================================== */
+
+@media screen {
+  .print-only {
+    display: none !important;
+  }
+}
+
+@media print {
+  /* Set A4 Page Dimensions and Clean Margins */
+  @page {
+    size: A4 portrait;
+    margin: 12mm 14mm 14mm 14mm;
+  }
+
+  /* Force Crisp Color Printing & Accurate Backgrounds */
+  *,
+  *::before,
+  *::after {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+    animation: none !important;
+    transition: none !important;
+  }
+
+  html,
+  body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    font-size: 10pt !important;
+    line-height: 1.45 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  /* Force light colors even if printed from Dark Mode */
+  .dark,
+  .dark body,
+  .dark main,
+  .dark section,
+  .dark div,
+  .dark p,
+  .dark span,
+  .dark h1,
+  .dark h2,
+  .dark h3,
+  .dark h4,
+  .dark h5,
+  .dark h6,
+  .dark a {
+    color: #0f172a !important;
+  }
+
+  .dark .text-slate-400,
+  .dark .text-slate-500,
+  .dark .text-slate-300 {
+    color: #475569 !important;
+  }
+
+  .dark .bg-slate-800,
+  .dark .bg-slate-900,
+  .dark .bg-slate-950,
+  .dark div[class*="dark:bg-slate-800"],
+  .dark div[class*="dark:bg-slate-900"],
+  .dark div[class*="dark:bg-[#0b0f19]"] {
+    background-color: #ffffff !important;
+    border-color: #e2e8f0 !important;
+  }
+
+  main {
+    min-height: 0 !important;
+  }
+
+  /* --------------------------------------------------------------------------
+     Hide Interactive Navigation, Floating Elements, Modals, & Controls
+     -------------------------------------------------------------------------- */
+  header,
+  nav,
+  #navbar,
+  .no-print,
+  .theme-toggle,
+  #back-to-top,
+  button,
+  input,
+  textarea,
+  select,
+  form,
+  .fixed,
+  [role="dialog"],
+  [aria-modal="true"],
+  .backdrop-blur-sm,
+  .backdrop-blur-md,
+  .mix-blend-multiply,
+  .mix-blend-screen,
+  .filter.blur-\[100px\],
+  .animate-pulse,
+  [id^="separator-"],
+  .section-divider {
+    display: none !important;
+  }
+
+  /* --------------------------------------------------------------------------
+     Section Layouts & Page Break Controls for A4
+     -------------------------------------------------------------------------- */
+  section {
+    min-height: 0 !important;
+    height: auto !important;
+    padding-top: 0.75rem !important;
+    padding-bottom: 0.75rem !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    background: transparent !important;
+    break-inside: auto !important;
+  }
+
+  /* Prevent Headings from Becoming Orphaned at Page Bottom */
+  h1, h2, h3, h4, h5, h6,
+  .section-heading {
+    color: #0f172a !important;
+    break-after: avoid !important;
+    page-break-after: avoid !important;
+  }
+
+  /* Prevent Unwanted Breaks Inside Cards */
+  .break-inside-avoid,
+  .project-card,
+  .experience-card,
+  .education-card,
+  .cert-card,
+  div[class*="rounded-3xl"],
+  div[class*="rounded-2xl"] {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    box-shadow: none !important;
+    border: 1px solid #e2e8f0 !important;
+    background-color: #ffffff !important;
+  }
+
+  /* --------------------------------------------------------------------------
+     Hero Section: Clean Resume Header Layout
+     -------------------------------------------------------------------------- */
+  #hero {
+    padding-top: 0 !important;
+    padding-bottom: 1rem !important;
+    min-height: 0 !important;
+  }
+
+  #hero h1 {
+    font-size: 22pt !important;
+    line-height: 1.15 !important;
+    margin-bottom: 0.25rem !important;
+  }
+
+  #hero h2 {
+    font-size: 12pt !important;
+    margin-bottom: 0.35rem !important;
+    color: #4338ca !important;
+  }
+
+  #hero p {
+    font-size: 9.5pt !important;
+    max-width: 100% !important;
+    line-height: 1.4 !important;
+  }
+
+  #hero .grid {
+    display: flex !important;
+    flex-direction: row-reverse !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    gap: 1.5rem !important;
+  }
+
+  /* Profile Photo Scaling for A4 */
+  #hero div[class*="w-56"],
+  #hero div[class*="w-64"] {
+    width: 100px !important;
+    height: 100px !important;
+    min-width: 100px !important;
+    min-height: 100px !important;
+    border: 2px solid #e2e8f0 !important;
+  }
+
+  #hero .order-1,
+  #hero .order-2 {
+    order: 1 !important;
+  }
+
+  /* --------------------------------------------------------------------------
+     Grid Formats: Convert 3-Column Grids to 2 Columns for Legibility on A4
+     -------------------------------------------------------------------------- */
+  #projects .grid,
+  #certifications .grid,
+  #skills .grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0.75rem !important;
+  }
+
+  #projects .grid > div,
+  #certifications .grid > div {
+    padding: 0.85rem !important;
+  }
+
+  /* --------------------------------------------------------------------------
+     Contact & Footer in Print
+     -------------------------------------------------------------------------- */
+  #contact .lg\\:grid-cols-5 {
+    display: block !important;
+  }
+
+  #contact .lg\\:col-span-2 {
+    width: 100% !important;
+  }
+
+  #contact .lg\\:col-span-3 {
+    display: none !important; /* Hide web contact message form */
+  }
+
+  footer {
+    background: transparent !important;
+    color: #64748b !important;
+    border-top: 1px solid #e2e8f0 !important;
+    padding: 0.75rem 0 !important;
+    margin-top: 1rem !important;
+  }
+
+  footer .grid,
+  footer .social-icons,
+  footer .no-print {
+    display: none !important;
+  }
+
+  /* --------------------------------------------------------------------------
+     Print Header & Footer Watermarks
+     -------------------------------------------------------------------------- */
+  .print-only {
+    display: block !important;
+  }
+
+  .print-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    border-bottom: 2px solid #e2e8f0 !important;
+    padding-bottom: 0.4rem !important;
+    margin-bottom: 0.8rem !important;
+    font-size: 8pt !important;
+    color: #64748b !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+  }
+
+  /* Clean Link Appearances */
+  a {
+    text-decoration: none !important;
+    color: inherit !important;
+  }
+
+  a[href^="http"]::after,
+  a[href^="#"]::after {
+    content: "" !important;
+  }
+}
+

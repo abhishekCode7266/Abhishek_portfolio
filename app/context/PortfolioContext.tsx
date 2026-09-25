@@ -1,5 +1,5 @@
 'use client';
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useRef, ReactNode } from 'react';
 import { loadFromStorage, saveToStorage } from '@/lib/storage';
 import { DEFAULT_PROFILE_IMAGE, DEFAULT_CERTIFICATE_IMAGE } from '@/lib/defaultAssets';
 import { getBundledGitHubProjects, fetchGitHubProjects } from '@/lib/githubSync';
@@ -32,6 +32,7 @@ export type Experience = {
   duration: string;
   description: string;
   isSeeking: boolean;
+  type?: 'internship' | 'job';
   certificateUrl?: string;
 };
 
@@ -41,8 +42,9 @@ export type Education = {
   institution: string;
   startDate: string;
   endDate: string;
-  percentage: string;
+  percentage?: string;
   location: string;
+  description?: string;
 };
 
 export type Certification = {
@@ -59,6 +61,11 @@ export type Certification = {
 };
 
 export type PortfolioData = {
+  name?: string;
+  headline?: string;
+  phone?: string;
+  address?: string;
+  careerMode?: 'internship' | 'job';
   profileImage: string | null;
   resumeUrl: string | null;
   resumeName: string | null;
@@ -83,6 +90,11 @@ export type PortfolioData = {
 };
 
 const defaultData: PortfolioData = {
+  name: "Abhishek Singh Yadav",
+  headline: "Computer Science Student • Software Developer",
+  phone: "+91 98765 43210",
+  address: "Uttar Pradesh, India",
+  careerMode: "internship",
   profileImage: DEFAULT_PROFILE_IMAGE,
   resumeUrl: "/Abhishek_Singh_Yadav_Resume.pdf",
   resumeName: "Abhishek_Singh_Yadav_Resume.pdf",
@@ -101,24 +113,15 @@ const defaultData: PortfolioData = {
   experience: [
     {
       id: "1",
-      title: "Software Developer Intern (Awaiting Placement)",
-      company: "Open to Internship Opportunities",
+      title: "Software Developer Intern",
+      company: "Seeking Internship Opportunities",
       duration: "2024 - Present",
-      description: "Actively seeking internship and trainee opportunities in software engineering, frontend development, and Python/Java application development. Passionate about contributing to impactful real-world software products.",
+      description: "Actively seeking internship and full-time trainee opportunities in software engineering, frontend development, and Python/Java application development. Ready to deliver immediate impact on production codebases.",
       isSeeking: true
     }
   ],
   projects: getBundledGitHubProjects(),
-  certifications: [
-    {
-      id: "cert-wadhwani-ai",
-      name: "Fundamentals of Artificial Intelligence",
-      issuer: "Wadhwani Foundation",
-      date: "18/JULY/2026",
-      link: "https://www.wadhwanifoundation.org",
-      fileUrl: DEFAULT_CERTIFICATE_IMAGE
-    }
-  ],
+  certifications: [],
   skills: [
     {
       id: "s1",
@@ -162,7 +165,7 @@ const defaultData: PortfolioData = {
 
 interface PortfolioContextType {
   data: PortfolioData;
-  updateData: (newData: Partial<PortfolioData>) => void;
+  updateData: (newData: Partial<PortfolioData>, immediate?: boolean) => void;
   isEditorOpen: boolean;
   setIsEditorOpen: React.Dispatch<React.SetStateAction<boolean>>;
   exportDataJSON: () => string;
@@ -278,19 +281,12 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
           remoteData?.profileImage || 
           DEFAULT_PROFILE_IMAGE;
 
-        // Resolve certifications ensuring default has certificate preview
-        const rawCerts = (saved?.certifications && saved.certifications.length > 0) 
-          ? saved.certifications 
-          : (remoteData?.certifications && remoteData.certifications.length > 0) 
-            ? remoteData.certifications 
+        // Resolve certifications
+        const resolvedCerts = Array.isArray(saved?.certifications)
+          ? saved.certifications
+          : Array.isArray(remoteData?.certifications)
+            ? remoteData.certifications
             : defaultData.certifications;
-
-        const resolvedCerts = rawCerts.map((cert, index) => {
-          if (index === 0 && !cert.fileUrl) {
-            return { ...cert, fileUrl: DEFAULT_CERTIFICATE_IMAGE };
-          }
-          return cert;
-        });
 
         const initialProjects = (saved?.projects && saved.projects.length >= 12)
           ? saved.projects
@@ -362,20 +358,37 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const updateData = (newData: Partial<PortfolioData>) => {
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const persistData = (payload: PortfolioData) => {
+    saveToStorage('portfolioData', payload).catch(error => {
+      console.error("Storage error:", error);
+    });
+
+    // Synchronize directly into public/portfolio-data.json in AI Studio workspace
+    if (typeof window !== 'undefined') {
+      fetch('/api/portfolio/save-data', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      }).catch(() => {});
+    }
+  };
+
+  const updateData = (newData: Partial<PortfolioData>, immediate = false) => {
     setData(prev => {
       const updated = { ...prev, ...newData };
-      saveToStorage('portfolioData', updated).catch(error => {
-        console.error("Storage error:", error);
-      });
 
-      // Synchronize directly into public/portfolio-data.json in AI Studio workspace
-      if (typeof window !== 'undefined') {
-        fetch('/api/portfolio/save-data', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(updated),
-        }).catch(() => {});
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+
+      if (immediate) {
+        persistData(updated);
+      } else {
+        saveTimeoutRef.current = setTimeout(() => {
+          persistData(updated);
+        }, 500);
       }
 
       return updated;

@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Printer } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 
 const navLinks = [
@@ -128,6 +128,17 @@ export function Navbar() {
 
           <div className="h-5 w-px bg-slate-200 dark:bg-slate-700/80" />
 
+          {/* Export PDF / Print Button */}
+          <button
+            type="button"
+            onClick={() => window.print()}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 bg-slate-100/80 dark:bg-slate-800 hover:bg-slate-200/70 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition-all cursor-pointer shadow-2xs"
+            title="Export portfolio as PDF / Print formatted for A4"
+          >
+            <Printer size={14} className="text-indigo-600 dark:text-indigo-400" />
+            <span>PDF</span>
+          </button>
+
           {/* Dark Mode Toggle Button */}
           <ThemeToggle id="theme-toggle-desktop" size="md" />
         </div>
@@ -179,11 +190,25 @@ export function Navbar() {
               );
             })}
 
-            <div className="pt-3 mt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between px-4">
-              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                Appearance
-              </span>
-              <ThemeToggle id="theme-toggle-mobile-drawer" showLabel={true} size="sm" />
+            <div className="pt-3 mt-2 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-2.5 px-4">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                  Appearance
+                </span>
+                <ThemeToggle id="theme-toggle-mobile-drawer" showLabel={true} size="sm" />
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  setTimeout(() => window.print(), 200);
+                }}
+                className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 border border-indigo-100 dark:border-indigo-900/60 transition-colors cursor-pointer"
+              >
+                <Printer size={15} />
+                <span>Export / Print Portfolio (PDF)</span>
+              </button>
             </div>
           </nav>
         </motion.div>

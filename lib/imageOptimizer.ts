@@ -46,8 +46,16 @@ export function optimizeImage(file: File, maxWidth = 1920, quality = 0.90): Prom
         ctx.imageSmoothingQuality = 'high';
         ctx.drawImage(img, 0, 0, width, height);
 
-        const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
-        resolve(compressedDataUrl);
+        try {
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+          if (compressedDataUrl && compressedDataUrl.length > 50) {
+            resolve(compressedDataUrl);
+          } else {
+            resolve(rawResult);
+          }
+        } catch {
+          resolve(rawResult);
+        }
       };
 
       img.onerror = () => {

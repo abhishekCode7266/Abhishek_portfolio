@@ -53,7 +53,7 @@ export function BackToTop() {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.7, y: 20 }}
           transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-          className="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 z-40 flex items-center justify-center group"
+          className="fixed bottom-6 right-6 sm:bottom-8 sm:right-8 z-40 flex items-center justify-center group no-print"
         >
           {/* Subtle tooltip on hover for desktop */}
           <div

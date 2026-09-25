@@ -2,13 +2,15 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
 import { SectionHeading } from './SectionHeading';
-import { MapPin, Mail, Github, Linkedin, Send, CheckCircle2, Loader2, Facebook, Instagram, MessageCircle, Twitter, Youtube } from 'lucide-react';
+import { MapPin, Mail, Github, Linkedin, Send, CheckCircle2, Loader2, Facebook, Instagram, MessageCircle, Twitter, Youtube, Phone, Pencil } from 'lucide-react';
 import { usePortfolio } from '@/app/context/PortfolioContext';
 import { formatUrl } from '@/lib/utils';
+import { ProfileDetailsModal } from './ProfileDetailsModal';
 
 export function Contact() {
   const { data } = usePortfolio();
   const [formStatus, setFormStatus] = useState<'idle' | 'loading' | 'success'>('idle');
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,14 +58,38 @@ export function Contact() {
                 </div>
               </div>
               
+              {data.phone && (
+                <div className="flex items-start gap-4">
+                  <div className="p-3 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 rounded-xl">
+                    <Phone size={24} />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-200 uppercase tracking-wider mb-1">Phone</h4>
+                    <a href={`tel:${data.phone.replace(/[^0-9+]/g, '')}`} className="text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
+                      {data.phone}
+                    </a>
+                  </div>
+                </div>
+              )}
+
               <div className="flex items-start gap-4">
                 <div className="p-3 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 rounded-xl">
                   <MapPin size={24} />
                 </div>
                 <div>
                   <h4 className="text-sm font-semibold text-slate-900 dark:text-slate-200 uppercase tracking-wider mb-1">Location</h4>
-                  <span className="text-slate-600 dark:text-slate-400">Uttar Pradesh, India</span>
+                  <span className="text-slate-600 dark:text-slate-400">{data.address || "Uttar Pradesh, India"}</span>
                 </div>
+              </div>
+
+              <div>
+                <button
+                  type="button"
+                  onClick={() => setIsModalOpen(true)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 rounded-lg transition-colors border border-indigo-100 dark:border-indigo-900/60 cursor-pointer"
+                >
+                  <Pencil size={13} /> Edit Profile & Contact Info
+                </button>
               </div>
             </div>
 
@@ -191,6 +217,11 @@ export function Contact() {
           </motion.div>
         </div>
       </div>
+
+      <ProfileDetailsModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </section>
   );
 }

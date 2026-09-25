@@ -1,5 +1,5 @@
 'use client';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { X, Upload, Sparkles, CheckCircle2, Award, Calendar, Building2, Link as LinkIcon, Loader2, FileText } from 'lucide-react';
 import { usePortfolio, Certification } from '@/app/context/PortfolioContext';
@@ -10,14 +10,16 @@ interface Props {
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: (cert: Certification) => void;
+  editingCert?: Certification | null;
+  onDelete?: (certId: string) => void;
 }
 
 function generateCertId(name: string, count: number): string {
   const clean = name.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').slice(0, 24);
-  return `cert-${clean || 'item'}-${count + 1}`;
+  return `cert-${clean || 'item'}-${Date.now().toString().slice(-6)}`;
 }
 
-export function CertificateUploadModal({ isOpen, onClose, onSuccess }: Props) {
+export function CertificateUploadModal({ isOpen, onClose, onSuccess, editingCert, onDelete }: Props) {
   const { data, updateData } = usePortfolio();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -26,7 +28,7 @@ export function CertificateUploadModal({ isOpen, onClose, onSuccess }: Props) {
   const [filePreview, setFilePreview] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string>('');
 
-  // Form fields (auto-populated by AI)
+  // Form fields (auto-populated by AI or pre-filled for edit)
   const [certName, setCertName] = useState('');
   const [certIssuer, setCertIssuer] = useState('');
   const [certDate, setCertDate] = useState('');
@@ -36,14 +38,34 @@ export function CertificateUploadModal({ isOpen, onClose, onSuccess }: Props) {
   const [aiExtracted, setAiExtracted] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  // Sync state whenever modal opens or editingCert changes
+  useEffect(() => {
+    if (isOpen) {
+      if (editingCert) {
+        setCertName(editingCert.name || '');
+        setCertIssuer(editingCert.issuer || '');
+        setCertDate(editingCert.date || '');
+        setCertStartDate(editingCert.startDate || '');
+        setCertCredentialId(editingCert.credentialId || '');
+        setCertLink(editingCert.link || '');
+        setFilePreview(editingCert.fileUrl || null);
+        setFileName(editingCert.name ? `${editingCert.name}` : 'Existing Certificate Document');
+        setAiExtracted(false);
+        setErrorMessage(null);
+      } else {
+        resetForm();
+      }
+    }
+  }, [isOpen, editingCert]);
+
   const handleFileChange = async (file: File) => {
     try {
       setErrorMessage(null);
       setIsProcessing(true);
       setFileName(file.name);
-      setProcessingStep('Compressing & preparing image...');
+      setProcessingStep('Compressing & preparing document...');
 
-      // 1. Optimize image into lightweight high-res data URL
+      // 1. Optimize image or read PDF into data URL
       const optimized = await optimizeImage(file, 1920, 0.90);
       setFilePreview(optimized);
 
@@ -51,13 +73,13 @@ export function CertificateUploadModal({ isOpen, onClose, onSuccess }: Props) {
       setProcessingStep('AI is analyzing certificate & extracting details...');
       const extracted = await extractCertificateDetails(optimized, file.name);
 
-      // 3. Auto-populate fields
-      setCertName(extracted.name || '');
-      setCertIssuer(extracted.issuer || '');
-      setCertDate(extracted.date || '');
-      setCertStartDate(extracted.startDate || '');
-      setCertCredentialId(extracted.credentialId || '');
-      setCertLink(extracted.link || '');
+      // 3. Auto-populate fields (keep existing if already set and user is replacing file, or populate extracted)
+      if (extracted.name) setCertName(extracted.name);
+      if (extracted.issuer) setCertIssuer(extracted.issuer);
+      if (extracted.date) setCertDate(extracted.date);
+      if (extracted.startDate) setCertStartDate(extracted.startDate);
+      if (extracted.credentialId) setCertCredentialId(extracted.credentialId);
+      if (extracted.link) setCertLink(extracted.link);
       setAiExtracted(true);
       setProcessingStep('');
     } catch (err) {
@@ -74,23 +96,60 @@ export function CertificateUploadModal({ isOpen, onClose, onSuccess }: Props) {
       return;
     }
 
-    const certId = generateCertId(certName, data.certifications.length);
-    const newCert: Certification = {
-      id: certId,
-      name: certName.trim(),
-      issuer: certIssuer.trim() || 'Verified Organization',
-      date: certDate.trim() || 'VERIFIED',
-      startDate: certStartDate.trim() || undefined,
-      credentialId: certCredentialId.trim() || undefined,
-      link: certLink.trim() || (filePreview || ''),
-      fileUrl: filePreview || undefined,
-    };
+    if (editingCert) {
+      // Update existing certificate
+      const updatedCert: Certification = {
+        ...editingCert,
+        name: certName.trim(),
+        issuer: certIssuer.trim() || 'Verified Organization',
+        date: certDate.trim() || 'VERIFIED',
+        startDate: certStartDate.trim() || undefined,
+        credentialId: certCredentialId.trim() || undefined,
+        link: certLink.trim() || (filePreview || ''),
+        fileUrl: filePreview || undefined,
+      };
 
-    const updatedCerts = [newCert, ...data.certifications];
-    updateData({ certifications: updatedCerts });
+      const updatedCerts = data.certifications.map(c => 
+        c.id === editingCert.id ? updatedCert : c
+      );
+      updateData({ certifications: updatedCerts }, true);
 
-    if (onSuccess) {
-      onSuccess(newCert);
+      if (onSuccess) {
+        onSuccess(updatedCert);
+      }
+    } else {
+      // Add new certificate
+      const certId = generateCertId(certName, data.certifications.length);
+      const newCert: Certification = {
+        id: certId,
+        name: certName.trim(),
+        issuer: certIssuer.trim() || 'Verified Organization',
+        date: certDate.trim() || 'VERIFIED',
+        startDate: certStartDate.trim() || undefined,
+        credentialId: certCredentialId.trim() || undefined,
+        link: certLink.trim() || (filePreview || ''),
+        fileUrl: filePreview || undefined,
+      };
+
+      const updatedCerts = [newCert, ...data.certifications];
+      updateData({ certifications: updatedCerts }, true);
+
+      if (onSuccess) {
+        onSuccess(newCert);
+      }
+    }
+
+    resetForm();
+    onClose();
+  };
+
+  const handleDelete = () => {
+    if (!editingCert) return;
+    if (onDelete) {
+      onDelete(editingCert.id);
+    } else {
+      const filtered = data.certifications.filter(c => c.id !== editingCert.id);
+      updateData({ certifications: filtered }, true);
     }
     resetForm();
     onClose();
@@ -112,6 +171,8 @@ export function CertificateUploadModal({ isOpen, onClose, onSuccess }: Props) {
 
   if (!isOpen) return null;
 
+  const isPdf = filePreview ? (filePreview.startsWith('data:application/pdf') || filePreview.toLowerCase().includes('.pdf')) : false;
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-900/80 backdrop-blur-sm">
       <motion.div
@@ -128,10 +189,12 @@ export function CertificateUploadModal({ isOpen, onClose, onSuccess }: Props) {
             </div>
             <div>
               <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base sm:text-lg">
-                Upload & Auto-Extract Certificate
+                {editingCert ? 'Edit & Correct Certificate' : 'Upload & Auto-Extract Certificate'}
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Upload your certificate image — AI auto-fills the name, organization & dates!
+                {editingCert 
+                  ? 'Update certificate information, correct typos, or replace the attached file.' 
+                  : 'Upload your certificate image — AI auto-fills the name, organization & dates!'}
               </p>
             </div>
           </div>
@@ -160,7 +223,7 @@ export function CertificateUploadModal({ isOpen, onClose, onSuccess }: Props) {
               <input
                 ref={fileInputRef}
                 type="file"
-                accept="image/*,.pdf"
+                accept="image/*,.pdf,application/pdf"
                 className="hidden"
                 onChange={(e) => {
                   const file = e.target.files?.[0];
@@ -171,43 +234,76 @@ export function CertificateUploadModal({ isOpen, onClose, onSuccess }: Props) {
                 <Upload size={28} />
               </div>
               <h4 className="text-base font-bold text-slate-800 dark:text-slate-100 mb-1">
-                Drop certificate image here or tap to browse
+                Drop certificate image or PDF here, or tap to browse
               </h4>
               <p className="text-xs text-slate-500 dark:text-slate-400 mb-4 max-w-sm mx-auto">
-                Supports JPG, PNG, WebP, or PDF. Captured photos from mobile cameras work great!
+                Supports JPG, PNG, WebP, or PDF documents.
               </p>
               <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 text-white text-xs font-semibold rounded-xl shadow-xs">
                 <Sparkles size={14} /> AI Auto-Fill Enabled
               </span>
             </div>
           ) : (
-            <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl">
-              <div className="flex items-center gap-3">
-                {filePreview.startsWith('data:image') ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={filePreview} alt="Preview" className="w-14 h-14 object-cover rounded-xl border border-slate-200 dark:border-slate-700" />
-                ) : (
-                  <div className="w-14 h-14 bg-indigo-100 dark:bg-indigo-950/80 rounded-xl flex items-center justify-center text-indigo-600 dark:text-indigo-400">
-                    <FileText size={24} />
+            <div className="p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  {!isPdf && (filePreview.startsWith('data:image') || filePreview.startsWith('http')) ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img 
+                      src={filePreview} 
+                      alt="Preview" 
+                      className="w-16 h-16 object-contain rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-2xs" 
+                    />
+                  ) : (
+                    <div className="w-16 h-16 bg-indigo-100 dark:bg-indigo-950/80 rounded-xl flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0">
+                      <FileText size={28} />
+                    </div>
+                  )}
+                  <div>
+                    <h5 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100 line-clamp-1">{fileName || certName || 'Certificate Document'}</h5>
+                    <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-1 mt-0.5">
+                      <CheckCircle2 size={13} /> {isPdf ? 'PDF Document Attached' : 'Image Certificate Attached'}
+                    </p>
                   </div>
-                )}
-                <div>
-                  <h5 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100 line-clamp-1">{fileName || 'Certificate Image'}</h5>
-                  <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-1 mt-0.5">
-                    <CheckCircle2 size={13} /> Attached & Analyzed
-                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <label className="cursor-pointer text-xs font-semibold px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 rounded-lg transition-colors shadow-2xs flex items-center gap-1.5">
+                    <Upload size={13} /> Replace File
+                    <input
+                      type="file"
+                      accept="image/*,.pdf,application/pdf"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleFileChange(file);
+                      }}
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFilePreview(null);
+                      setAiExtracted(false);
+                    }}
+                    className="text-xs text-slate-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 font-semibold px-2.5 py-1.5 rounded-lg hover:bg-slate-200/60 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                  >
+                    Remove
+                  </button>
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={() => {
-                  setFilePreview(null);
-                  setAiExtracted(false);
-                }}
-                className="text-xs text-slate-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 font-semibold px-3 py-1.5 rounded-lg hover:bg-slate-200/60 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-              >
-                Change File
-              </button>
+
+              {/* In-modal high-clarity preview banner if image is loaded */}
+              {!isPdf && filePreview && (
+                <div className="w-full max-h-48 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 flex items-center justify-center p-2">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img 
+                    src={filePreview} 
+                    alt="Certificate Preview" 
+                    className="max-h-44 w-auto object-contain rounded"
+                  />
+                </div>
+              )}
             </div>
           )}
 
@@ -226,7 +322,7 @@ export function CertificateUploadModal({ isOpen, onClose, onSuccess }: Props) {
           {aiExtracted && (
             <div className="p-3.5 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 rounded-2xl flex items-center gap-2.5 text-emerald-800 dark:text-emerald-300 text-xs font-semibold">
               <Sparkles size={16} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
-              <span>AI automatically extracted and populated your certificate fields below! Review or edit anytime.</span>
+              <span>AI automatically extracted certificate details below! You can review or manually correct any field before saving.</span>
             </div>
           )}
 
@@ -324,20 +420,31 @@ export function CertificateUploadModal({ isOpen, onClose, onSuccess }: Props) {
 
         {/* Footer */}
         <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-800/80">
-          <button
-            type="button"
-            onClick={() => { resetForm(); onClose(); }}
-            className="px-4 py-2 text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100 text-xs sm:text-sm font-semibold transition-colors cursor-pointer"
-          >
-            Cancel
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => { resetForm(); onClose(); }}
+              className="px-4 py-2 text-slate-600 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100 text-xs sm:text-sm font-semibold transition-colors cursor-pointer"
+            >
+              Cancel
+            </button>
+            {editingCert && (
+              <button
+                type="button"
+                onClick={handleDelete}
+                className="px-3.5 py-2 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/40 text-xs sm:text-sm font-semibold rounded-xl transition-colors cursor-pointer"
+              >
+                Delete Certificate
+              </button>
+            )}
+          </div>
           <button
             type="button"
             disabled={isProcessing || !certName.trim()}
             onClick={handleSave}
             className="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-300 dark:disabled:bg-indigo-900 text-white text-xs sm:text-sm font-semibold rounded-xl shadow-xs transition-all cursor-pointer"
           >
-            <CheckCircle2 size={16} /> Save to Portfolio
+            <CheckCircle2 size={16} /> {editingCert ? 'Update Certificate' : 'Save to Portfolio'}
           </button>
         </div>
       </motion.div>

@@ -2,17 +2,28 @@
 import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { SectionHeading } from './SectionHeading';
-import { Award, ExternalLink, FileText, Search, X, Maximize2, Download, CheckCircle2, Sparkles, Plus } from 'lucide-react';
+import { Award, ExternalLink, FileText, Search, X, Maximize2, Download, CheckCircle2, Sparkles, Plus, Pencil, Trash2, Eye } from 'lucide-react';
 import { usePortfolio, Certification } from '@/app/context/PortfolioContext';
 import { formatUrl } from '@/lib/utils';
 import { CertificateUploadModal } from './CertificateUploadModal';
 
 export function Certifications() {
-  const { data, setIsEditorOpen } = usePortfolio();
+  const { data, updateData, setIsEditorOpen } = usePortfolio();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedIssuer, setSelectedIssuer] = useState<string>('All');
   const [previewCert, setPreviewCert] = useState<Certification | null>(null);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [editingCert, setEditingCert] = useState<Certification | null>(null);
+
+  const isPdf = (url?: string) => {
+    if (!url) return false;
+    return url.startsWith('data:application/pdf') || url.toLowerCase().includes('.pdf');
+  };
+
+  const handleDeleteCert = (certId: string) => {
+    const updated = data.certifications.filter(c => c.id !== certId);
+    updateData({ certifications: updated }, true);
+  };
 
   // Extract unique issuers for filtering
   const issuers = useMemo(() => {
@@ -48,7 +59,10 @@ export function Certifications() {
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <button
-              onClick={() => setIsUploadModalOpen(true)}
+              onClick={() => {
+                setEditingCert(null);
+                setIsUploadModalOpen(true);
+              }}
               className="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-semibold rounded-xl shadow-xs hover:shadow-md transition-all cursor-pointer"
             >
               <Sparkles size={15} />
@@ -121,10 +135,13 @@ export function Certifications() {
               You can easily upload and showcase all of your 20+ certificates using the portfolio manager.
             </p>
             <button
-              onClick={() => setIsEditorOpen(true)}
-              className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl shadow-sm transition-all cursor-pointer"
+              onClick={() => {
+                setEditingCert(null);
+                setIsUploadModalOpen(true);
+              }}
+              className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl shadow-sm transition-all cursor-pointer inline-flex items-center gap-2"
             >
-              Add Your First Certificate
+              <Plus size={16} /> Add / Upload Certificate
             </button>
           </div>
         ) : filteredCertifications.length === 0 ? (
@@ -146,36 +163,72 @@ export function Certifications() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: Math.min(idx * 0.05, 0.5) }}
-                className="bg-white dark:bg-slate-800/90 rounded-3xl p-6 sm:p-7 border border-slate-200/80 dark:border-slate-700/80 shadow-xs dark:shadow-slate-950/50 hover:shadow-xl hover:border-indigo-200 dark:hover:border-indigo-500/50 transition-all group flex flex-col h-full"
+                className="bg-white dark:bg-slate-800/90 rounded-3xl p-6 sm:p-7 border border-slate-200/80 dark:border-slate-700/80 shadow-xs dark:shadow-slate-950/50 hover:shadow-xl hover:border-indigo-200 dark:hover:border-indigo-500/50 transition-all group flex flex-col h-full relative"
               >
                 <div className="flex justify-between items-start mb-4">
                   <div className="p-2.5 bg-indigo-50 dark:bg-indigo-950/60 rounded-xl text-indigo-600 dark:text-indigo-400 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
                     <Award size={24} />
                   </div>
-                  {cert.date && (
-                    <span className="text-xs font-semibold text-slate-400 dark:text-slate-400 bg-slate-50 dark:bg-slate-700/50 px-2.5 py-1 rounded-lg border border-slate-100 dark:border-slate-600/50">
-                      {cert.date}
-                    </span>
-                  )}
+                  
+                  <div className="flex items-center gap-1.5">
+                    {cert.date && (
+                      <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-700/50 px-2.5 py-1 rounded-lg border border-slate-100 dark:border-slate-600/50 mr-1">
+                        {cert.date}
+                      </span>
+                    )}
+                    <button
+                      onClick={() => {
+                        setEditingCert(cert);
+                        setIsUploadModalOpen(true);
+                      }}
+                      className="p-1.5 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/50 rounded-lg transition-colors cursor-pointer"
+                      title="Edit / Correct Certificate"
+                    >
+                      <Pencil size={15} />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteCert(cert.id)}
+                      className="p-1.5 text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/50 rounded-lg transition-colors cursor-pointer"
+                      title="Delete Certificate"
+                    >
+                      <Trash2 size={15} />
+                    </button>
+                  </div>
                 </div>
                 
-                {/* Visual Certificate Card Preview */}
-                {cert.fileUrl && !cert.fileUrl.toLowerCase().endsWith('.pdf') && (
-                  <div 
-                    onClick={() => setPreviewCert(cert)}
-                    className="relative w-full h-44 mb-5 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 shadow-inner flex items-center justify-center p-2 cursor-pointer group/img"
-                    title="Click to view full certificate"
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img 
-                      src={cert.fileUrl} 
-                      alt={cert.name} 
-                      className="object-contain w-full h-full rounded transition-transform duration-300 group-hover/img:scale-[1.02]" 
-                    />
-                    <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center gap-1.5 text-white text-xs font-semibold rounded-2xl backdrop-blur-[2px]">
-                      <Maximize2 size={16} /> Click to expand
+                {/* Visual Certificate Card Preview (Image or PDF) */}
+                {cert.fileUrl && (
+                  isPdf(cert.fileUrl) ? (
+                    <div 
+                      onClick={() => setPreviewCert(cert)}
+                      className="relative w-full h-44 mb-5 rounded-2xl overflow-hidden border border-indigo-100 dark:border-slate-700 bg-indigo-50/40 dark:bg-slate-900/60 shadow-inner flex flex-col items-center justify-center p-4 cursor-pointer group/pdf hover:border-indigo-400 transition-colors"
+                      title="Click to view/download PDF certificate"
+                    >
+                      <div className="w-12 h-12 rounded-xl bg-red-100 dark:bg-red-950/80 text-red-600 dark:text-red-400 flex items-center justify-center mb-2 shadow-xs group-hover/pdf:scale-105 transition-transform">
+                        <FileText size={24} />
+                      </div>
+                      <span className="text-xs font-bold text-slate-800 dark:text-slate-200 line-clamp-1">{cert.name}</span>
+                      <span className="text-[11px] text-indigo-600 dark:text-indigo-400 font-medium mt-1 flex items-center gap-1">
+                        <Eye size={12} /> View Document
+                      </span>
                     </div>
-                  </div>
+                  ) : (
+                    <div 
+                      onClick={() => setPreviewCert(cert)}
+                      className="relative w-full h-44 mb-5 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 shadow-inner flex items-center justify-center p-2 cursor-pointer group/img"
+                      title="Click to expand full certificate"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img 
+                        src={cert.fileUrl} 
+                        alt={cert.name} 
+                        className="object-contain w-full h-full rounded transition-transform duration-300 group-hover/img:scale-[1.02]" 
+                      />
+                      <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center gap-1.5 text-white text-xs font-semibold rounded-2xl backdrop-blur-[2px]">
+                        <Maximize2 size={16} /> Click to expand
+                      </div>
+                    </div>
+                  )
                 )}
 
                 <h4 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors leading-snug">
@@ -239,9 +292,9 @@ export function Certifications() {
                 </button>
               </div>
 
-              {/* Modal Body / Image View */}
+              {/* Modal Body / Image or PDF View */}
               <div className="p-4 sm:p-6 flex-1 overflow-auto flex items-center justify-center bg-slate-100/50 dark:bg-slate-900/60 min-h-[300px]">
-                {previewCert.fileUrl && previewCert.fileUrl.startsWith('data:image') ? (
+                {previewCert.fileUrl && !isPdf(previewCert.fileUrl) ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={previewCert.fileUrl}
@@ -250,8 +303,9 @@ export function Certifications() {
                   />
                 ) : previewCert.fileUrl ? (
                   <div className="text-center py-12">
-                    <FileText size={48} className="mx-auto text-indigo-500 dark:text-indigo-400 mb-3" />
-                    <p className="text-slate-700 dark:text-slate-200 font-semibold mb-4">PDF Certificate Document</p>
+                    <FileText size={56} className="mx-auto text-indigo-500 dark:text-indigo-400 mb-3" />
+                    <p className="text-slate-700 dark:text-slate-200 font-semibold mb-2">PDF Certificate Document</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mb-5">{previewCert.name}</p>
                     <a
                       href={previewCert.fileUrl}
                       download={`${previewCert.name || 'certificate'}.pdf`}
@@ -269,10 +323,21 @@ export function Certifications() {
               <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 flex-wrap gap-3">
                 <span className="text-xs text-slate-500 dark:text-slate-400">Official Certificate Preview</span>
                 <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => {
+                      const toEdit = previewCert;
+                      setPreviewCert(null);
+                      setEditingCert(toEdit);
+                      setIsUploadModalOpen(true);
+                    }}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 text-xs font-semibold rounded-xl transition-colors cursor-pointer"
+                  >
+                    <Pencil size={14} /> Edit Details
+                  </button>
                   {previewCert.fileUrl && (
                     <a
                       href={previewCert.fileUrl}
-                      download={`${previewCert.name || 'certificate'}.jpg`}
+                      download={`${previewCert.name || 'certificate'}.${isPdf(previewCert.fileUrl) ? 'pdf' : 'jpg'}`}
                       className="inline-flex items-center gap-1.5 px-4 py-2 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-semibold rounded-xl transition-colors"
                     >
                       <Download size={14} /> Download
@@ -298,7 +363,12 @@ export function Certifications() {
       {/* Certificate AI Upload & Auto-Extraction Modal */}
       <CertificateUploadModal
         isOpen={isUploadModalOpen}
-        onClose={() => setIsUploadModalOpen(false)}
+        onClose={() => {
+          setIsUploadModalOpen(false);
+          setEditingCert(null);
+        }}
+        editingCert={editingCert}
+        onDelete={handleDeleteCert}
       />
     </section>
   );

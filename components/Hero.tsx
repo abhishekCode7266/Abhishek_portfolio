@@ -1,15 +1,17 @@
 'use client';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { motion } from 'motion/react';
-import { Github, Linkedin, Mail, Upload, Download, ArrowDown, FileText, Facebook, Instagram, MessageCircle, Send, Twitter, Youtube } from 'lucide-react';
+import { Github, Linkedin, Mail, Upload, Download, ArrowDown, FileText, Facebook, Instagram, MessageCircle, Send, Twitter, Youtube, Pencil, Sparkles, Printer } from 'lucide-react';
 import { usePortfolio } from '@/app/context/PortfolioContext';
 import Image from 'next/image';
 import { formatUrl } from '@/lib/utils';
 import { optimizeImage } from '@/lib/imageOptimizer';
+import { ProfileDetailsModal } from './ProfileDetailsModal';
 
 export function Hero() {
   const { data, updateData } = usePortfolio();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -51,13 +53,23 @@ export function Hero() {
           transition={{ duration: 0.8 }}
           className="flex flex-col items-center text-center lg:items-start lg:text-left gap-6 order-2 lg:order-1"
         >
+          {/* Career Focus Status Badge */}
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white dark:bg-slate-800 border border-slate-200/90 dark:border-slate-700 shadow-2xs text-xs font-semibold text-slate-700 dark:text-slate-300">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span>
+              {data.careerMode === 'job'
+                ? '💼 Open to Full-Time Software Roles'
+                : '🎓 Open to Internship & Trainee Roles'}
+            </span>
+          </div>
+
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-slate-900 dark:text-white leading-[1.1] tracking-tight">
             Hi, I&apos;m <br className="hidden lg:block" />
-            <span className="text-indigo-600 dark:text-indigo-400">Abhishek Singh Yadav</span>
+            <span className="text-indigo-600 dark:text-indigo-400">{data.name || 'Abhishek Singh Yadav'}</span>
           </h1>
           
           <h2 className="text-xl sm:text-2xl font-medium text-slate-600 dark:text-slate-300">
-            Computer Science Student &bull; Software Developer
+            {data.headline || 'Computer Science Student • Software Developer'}
           </h2>
           
           <p className="text-slate-600 dark:text-slate-300 text-lg leading-relaxed max-w-xl">
@@ -66,16 +78,30 @@ export function Hero() {
             and building practical applications.
           </p>
 
-          <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 mt-4">
+          {/* Print-Only Contact & Resume Header Details */}
+          <div className="print-only text-xs text-slate-700 space-y-1 pt-1 border-t border-slate-200 mt-2">
+            <div className="flex flex-wrap gap-x-4 gap-y-1 font-medium">
+              <span>📍 {data.address || 'Uttar Pradesh, India'}</span>
+              {data.phone && <span>📞 {data.phone}</span>}
+              {data.socialLinks?.email && <span>✉️ {data.socialLinks.email}</span>}
+            </div>
+            <div className="flex flex-wrap gap-x-4 gap-y-1 text-slate-500 font-mono text-[10px]">
+              {data.socialLinks?.linkedin && <span>LinkedIn: {data.socialLinks.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</span>}
+              {data.socialLinks?.github && <span>GitHub: {data.socialLinks.github.replace(/^https?:\/\/(www\.)?/, '')}</span>}
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 sm:gap-4 mt-4 no-print">
             <a 
               id="hero-view-projects-btn"
               href="#projects"
               onClick={scrollToProjects}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 dark:bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 dark:hover:bg-indigo-500 hover:shadow-indigo-300/40 dark:hover:shadow-indigo-900/30 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 shadow-lg shadow-indigo-200/50 dark:shadow-none cursor-pointer"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 dark:bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 dark:hover:bg-indigo-500 hover:shadow-indigo-300/40 dark:hover:shadow-indigo-900/30 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 shadow-lg shadow-indigo-200/50 dark:shadow-none cursor-pointer text-sm"
             >
               View Projects
               <ArrowDown size={18} />
             </a>
+
             <a 
               id="hero-download-cv-btn"
               href={data.resumeUrl || "/Abhishek_Singh_Yadav_Resume.pdf"} 
@@ -83,7 +109,7 @@ export function Hero() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Download Abhishek Singh Yadav's CV in PDF format"
-              className="group relative inline-flex items-center gap-2.5 px-6 py-3 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-slate-700/80 font-medium rounded-xl transition-all duration-200 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-500/50 hover:-translate-y-0.5 active:translate-y-0 border border-slate-200/90 dark:border-slate-700 cursor-pointer overflow-hidden"
+              className="group relative inline-flex items-center gap-2.5 px-6 py-3 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-slate-700/80 font-medium rounded-xl transition-all duration-200 shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-500/50 hover:-translate-y-0.5 active:translate-y-0 border border-slate-200/90 dark:border-slate-700 cursor-pointer overflow-hidden text-sm"
             >
               {/* Subtle light shimmer on hover */}
               <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-indigo-500/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out pointer-events-none" />
@@ -91,6 +117,26 @@ export function Hero() {
               <span>Download CV</span>
               <Download size={16} className="text-indigo-600 dark:text-indigo-400 group-hover:translate-y-0.5 transition-transform duration-200" />
             </a>
+
+            <button
+              type="button"
+              onClick={() => window.print()}
+              className="inline-flex items-center gap-2 px-4 py-3 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium rounded-xl border border-slate-200/90 dark:border-slate-700 hover:border-indigo-300 transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5 cursor-pointer text-sm"
+              title="Export Portfolio as PDF / Print formatted for A4"
+            >
+              <Printer size={16} className="text-indigo-600 dark:text-indigo-400" />
+              <span>Export PDF</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setIsProfileModalOpen(true)}
+              className="inline-flex items-center gap-2 px-4 py-3 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium rounded-xl border border-slate-200/90 dark:border-slate-700 hover:border-indigo-300 transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5 cursor-pointer text-sm"
+              title="Edit Profile & Contact Details"
+            >
+              <Pencil size={15} />
+              <span>Edit Profile</span>
+            </button>
           </div>
 
           <div className="flex flex-wrap gap-4 mt-4">
@@ -169,6 +215,11 @@ export function Hero() {
           </div>
         </motion.div>
       </div>
+
+      <ProfileDetailsModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+      />
     </section>
   );
 }
