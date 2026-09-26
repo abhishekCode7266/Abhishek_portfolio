@@ -39,9 +39,9 @@ export function PrintHeader({
       className="print-only print-header w-full border-b border-slate-300 pb-2 mb-4"
       aria-hidden="true"
     >
-      <div className="flex justify-between items-baseline w-full text-slate-800">
-        <div className="flex items-baseline gap-2">
-          <span className="font-bold text-sm tracking-tight text-slate-900 uppercase">
+      <div className="flex justify-between items-center w-full text-slate-800">
+        <div className="flex items-center gap-2">
+          <span className="print-name font-bold text-sm tracking-tight text-slate-900 uppercase flex items-center">
             {displayName}
           </span>
           {subtitle && (

@@ -18,10 +18,11 @@ html {
 }
 
 @media print {
-  /* Set A4 Page Dimensions and Clean Margins */
+  /* Set A4 Page Dimensions, Clean Margins, and Page Counter */
   @page {
     size: A4 portrait;
     margin: 12mm 14mm 14mm 14mm;
+    counter-increment: page;
   }
 
   /* Force Crisp Color Printing & Accurate Backgrounds */
@@ -95,6 +96,7 @@ html {
   .no-print,
   .theme-toggle,
   #back-to-top,
+  #floating-print-resume-btn,
   button,
   input,
   textarea,
@@ -109,8 +111,21 @@ html {
   .mix-blend-screen,
   .filter.blur-\[100px\],
   .animate-pulse,
+
+  /* Explicitly hide PortfolioEditor component, modal & controls */
+  #portfolio-editor,
+  #portfolio-editor-modal,
+  .portfolio-editor,
+  [data-component="PortfolioEditor"],
+  [data-component="portfolio-editor"],
+  button[title*="Edit Portfolio"],
+
+  /* Explicitly hide SectionDivider components & decorative separators */
+  .section-divider,
+  [data-component="SectionDivider"],
+  [data-component="section-divider"],
   [id^="separator-"],
-  .section-divider {
+  div[id^="separator-"] {
     display: none !important;
   }
 
@@ -149,6 +164,145 @@ html {
     box-shadow: none !important;
     border: 1px solid #e2e8f0 !important;
     background-color: #ffffff !important;
+  }
+
+  /* --------------------------------------------------------------------------
+     Unordered Lists & Bullet Points for Professional PDF Resumes
+     -------------------------------------------------------------------------- */
+  ul,
+  ul.list-disc,
+  ul.list-inside,
+  ul.list-none,
+  [class*="list-disc"] {
+    list-style-type: disc !important;
+    list-style-position: outside !important;
+    margin-top: 0.35rem !important;
+    margin-bottom: 0.5rem !important;
+    padding-left: 1.35rem !important;
+    margin-left: 0 !important;
+  }
+
+  /* Ordered Lists */
+  ol,
+  ol.list-decimal {
+    list-style-type: decimal !important;
+    list-style-position: outside !important;
+    margin-top: 0.35rem !important;
+    margin-bottom: 0.5rem !important;
+    padding-left: 1.35rem !important;
+    margin-left: 0 !important;
+  }
+
+  /* Multi-level Nested Lists */
+  ul ul,
+  ol ul {
+    list-style-type: circle !important;
+    list-style-position: outside !important;
+    margin-top: 0.2rem !important;
+    margin-bottom: 0.25rem !important;
+    padding-left: 1.2rem !important;
+  }
+
+  ul ul ul,
+  ol ul ul,
+  ul ol ul {
+    list-style-type: square !important;
+    list-style-position: outside !important;
+    padding-left: 1.1rem !important;
+  }
+
+  /* Individual List Items: Sizing, Alignment & Break Protection */
+  li {
+    display: list-item !important;
+    font-size: 9pt !important;
+    line-height: 1.45 !important;
+    color: #334155 !important;
+    margin-bottom: 0.25rem !important;
+    padding-left: 0.25rem !important;
+    text-align: left !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  /* Bullet Markers: Precise Sizing, Alignment & Executive Color */
+  li::marker {
+    color: #4338ca !important;
+    font-size: 0.85em !important;
+    line-height: 1 !important;
+  }
+
+  /* Clean up any paragraph children inside list items */
+  li > p {
+    display: inline !important;
+    margin: 0 !important;
+    line-height: inherit !important;
+  }
+
+  /* Exclude navigational lists from bullet rendering if any remain */
+  nav ul,
+  footer ul,
+  .no-bullets,
+  [role="tablist"],
+  [role="navigation"] ul {
+    list-style-type: none !important;
+    padding-left: 0 !important;
+  }
+
+  /* --------------------------------------------------------------------------
+     Tables: Borders, Cell Padding, Header Formatting & Break-Inside Avoidance
+     -------------------------------------------------------------------------- */
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    border-spacing: 0 !important;
+    margin-top: 0.5rem !important;
+    margin-bottom: 0.75rem !important;
+    font-size: 8.5pt !important;
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+    border: 1px solid #cbd5e1 !important;
+  }
+
+  thead {
+    display: table-header-group !important;
+    background-color: #f1f5f9 !important;
+  }
+
+  tfoot {
+    display: table-footer-group !important;
+  }
+
+  tbody {
+    display: table-row-group !important;
+  }
+
+  tr {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  th {
+    background-color: #f8fafc !important;
+    color: #1e293b !important;
+    font-weight: 600 !important;
+    text-align: left !important;
+    padding: 5px 8px !important;
+    border: 1px solid #cbd5e1 !important;
+    font-size: 8.5pt !important;
+    letter-spacing: 0.02em !important;
+  }
+
+  td {
+    padding: 4px 8px !important;
+    border: 1px solid #e2e8f0 !important;
+    color: #334155 !important;
+    font-size: 8pt !important;
+    line-height: 1.35 !important;
+    vertical-align: top !important;
+  }
+
+  tbody tr:nth-child(even) td {
+    background-color: #f8fafc !important;
   }
 
   /* --------------------------------------------------------------------------
@@ -266,13 +420,69 @@ html {
     letter-spacing: 0.05em !important;
   }
 
-  /* Clean Link Appearances */
+  /* Branded Favicon / Logo next to 'Abhishek Singh Yadav' in PrintHeader */
+  .print-header-logo,
+  .print-header .print-name::before,
+  .print-header span[class*="font-bold"]::before {
+    content: "" !important;
+    display: inline-block !important;
+    width: 14px !important;
+    height: 14px !important;
+    margin-right: 6px !important;
+    vertical-align: -1.5px !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32' width='32' height='32'%3E%3Crect width='32' height='32' rx='7' fill='%234338ca'/%3E%3Cpath d='M10 23L16 9L22 23M12.4 18H19.6' stroke='%23ffffff' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+    background-size: contain !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    border-radius: 3px !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .print-footer {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    border-top: 1.5px solid #e2e8f0 !important;
+    padding-top: 0.35rem !important;
+    margin-top: 1.5rem !important;
+    font-size: 7.5pt !important;
+    color: #64748b !important;
+    width: 100% !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  .print-footer .current-page-num::after {
+    content: counter(page);
+  }
+
+  /* --------------------------------------------------------------------------
+     Hyperlink URL Appending for Printed Reference Document
+     -------------------------------------------------------------------------- */
   a {
     text-decoration: none !important;
     color: inherit !important;
   }
 
-  a[href^="http"]::after,
+  /* Append full URL of hyperlinked text in parentheses next to the link label */
+  a[href^="http"]:not([href*="javascript"])::after {
+    content: " (" attr(href) ")" !important;
+    font-size: 7.5pt !important;
+    font-weight: normal !important;
+    color: #475569 !important;
+    word-break: break-all !important;
+  }
+
+  /* Append email addresses for mailto links */
+  a[href^="mailto:"]::after {
+    content: " (" attr(href) ")" !important;
+    font-size: 7.5pt !important;
+    font-weight: normal !important;
+    color: #475569 !important;
+  }
+
+  /* Exclude internal jump hash anchors from having URLs appended */
   a[href^="#"]::after {
     content: "" !important;
   }

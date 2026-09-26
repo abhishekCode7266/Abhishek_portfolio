@@ -12,6 +12,7 @@ import { PortfolioEditor } from '@/components/PortfolioEditor';
 import { SectionDivider } from '@/components/SectionDivider';
 import { BackToTop } from '@/components/BackToTop';
 import { PrintHeader } from '@/components/PrintHeader';
+import { PrintFooter } from '@/components/PrintFooter';
 import { FloatingPrintButton } from '@/components/FloatingPrintButton';
 
 export default function Home() {
@@ -36,6 +37,7 @@ export default function Home() {
       <Contact />
       <SectionDivider id="separator-footer" />
       <Footer />
+      <PrintFooter />
       <PortfolioEditor />
       <BackToTop />
       <FloatingPrintButton />

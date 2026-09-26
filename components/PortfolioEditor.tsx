@@ -195,8 +195,10 @@ export function PortfolioEditor() {
   if (!isEditorOpen) {
     return (
       <button 
+        id="portfolio-editor"
+        data-component="PortfolioEditor"
         onClick={() => setIsEditorOpen(true)}
-        className="fixed bottom-6 right-6 z-50 p-4 bg-indigo-600 text-white rounded-full shadow-2xl hover:bg-indigo-700 transition-all hover:scale-105 flex items-center justify-center group no-print"
+        className="portfolio-editor fixed bottom-6 right-6 z-50 p-4 bg-indigo-600 text-white rounded-full shadow-2xl hover:bg-indigo-700 transition-all hover:scale-105 flex items-center justify-center group no-print"
         title="Edit Portfolio Content"
       >
         <Settings size={24} className="group-hover:rotate-90 transition-transform duration-300" />
@@ -222,7 +224,11 @@ export function PortfolioEditor() {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 dark:bg-slate-950/70 backdrop-blur-sm p-4 sm:p-6 no-print">
+    <div 
+      id="portfolio-editor-modal"
+      data-component="PortfolioEditor"
+      className="portfolio-editor fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 dark:bg-slate-950/70 backdrop-blur-sm p-4 sm:p-6 no-print"
+    >
       <motion.div 
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}

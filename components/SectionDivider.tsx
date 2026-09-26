@@ -10,8 +10,9 @@ export function SectionDivider({ id, className = '' }: SectionDividerProps) {
   return (
     <div
       id={id}
+      data-component="SectionDivider"
       aria-hidden="true"
-      className={`relative w-full flex items-center justify-center pointer-events-none select-none z-10 -my-px overflow-hidden ${className}`}
+      className={`section-divider no-print relative w-full flex items-center justify-center pointer-events-none select-none z-10 -my-px overflow-hidden ${className}`}
     >
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
